@@ -2,30 +2,244 @@ import pygame
 import sys
 
 pygame.init()
+pygame.mixer.init()
 
-# ================== SCREEN SETUP ==================
-WIDTH = 960
-HEIGHT = 720
+from settings import *
+from entities.platform import Platform
+from entities.spike import Spike
+from entities.door import Door
+from entities.player import Player
+from systems.ping import PingSystem
+from levels.level import Level
+from levels.level_manager import LevelManager
 
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Resonight")
-clock = pygame.time.Clock()
+class Game:
+    def __init__(self):
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        pygame.display.set_caption("Resonight Prototype")
+        self.clock = pygame.time.Clock()
+        self.running = True
 
-# COLORS
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
+        self.ground_y = HEIGHT - 40
 
-running = True
-while running:
-    clock.tick(60)
-    screen.fill(BLACK)
+        self.MENU = "menu"
+        self.LEVEL = "level"
+        self.GAME_OVER = "game_over"
+        self.state = self.MENU
 
-    # ---------- INPUT / EVENTS ----------
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+        self.level_manager = LevelManager()
 
-    pygame.display.flip()
+        # ---------------- LEVEL 1 ----------------
+        level1 = Level(
+            platforms=[
+                Platform(0, 600, 200, 20),
+                Platform(300, 550, 150, 20),
+                Platform(500, 470, 200, 20),
+                Platform(350, 380, 120, 20),
+            ],
+            spikes=[
+                Spike(500, self.ground_y - 30, 30, 30),
+                Spike(530, self.ground_y - 30, 30, 30),
+                Spike(560, self.ground_y - 30, 30, 30),
+            ],
+            doors=[
+                Door(300, self.ground_y - 70, 50, 70, "entrance"),
+                Door(400, self.ground_y - 70, 50, 70, "exit"),
+            ],
+            player_spawn=(100, 500),
+            bg_path="assets/images/backgrounds/bg_2.png"
+        )
 
-pygame.quit()
-sys.exit()
+        # ---------------- LEVEL 2 ----------------
+        level2 = Level(
+            platforms=[
+                Platform(100, 650, 250, 20),
+                Platform(400, 580, 200, 20),
+                Platform(650, 500, 180, 20),
+            ],
+            spikes=[
+                Spike(420, 650, 30, 30),
+                Spike(450, 650, 30, 30),
+            ],
+            doors=[
+                Door(650, 430, 50, 70, "exit"),
+            ],
+            player_spawn=(120, 550),
+            bg_path="assets/images/backgrounds/bg_2.png"
+
+        )
+
+        self.level_manager.add_level(1, level1)
+        self.level_manager.add_level(2, level2)
+
+        self.current_level = self.level_manager.load(1)
+
+        # ================= PLAYER =================
+        self.player = Player(*self.current_level.player_spawn)
+
+        # ================= PING =================
+        self.ping = PingSystem((WIDTH, HEIGHT))
+
+        # ================= MASK =================
+        self.fade_speed = 255 / 18
+        self.mask_closing = False
+        self.mask_timer = 0
+        self.MASK_DELAY = 30
+
+        # ================= ASSETS =================
+        self.vignette = pygame.image.load("assets/images/effects/Vignette.png").convert_alpha()
+        self.sound = pygame.mixer.Sound("assets/sounds/Finger_snap.mp3")
+
+    # =========================================================
+    #                      EVENTS
+    # =========================================================
+    def handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+            if self.state == "level":
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_e:
+                        self.sound.play()
+                        self.ping.trigger(self.player.rect.center)
+                        self.mask_closing = False
+                        self.mask_timer = 0
+
+    # =========================================================
+    #                  REVEAL SYSTEM
+    # =========================================================
+    def update_reveal(self):
+        for p in self.current_level.platforms:
+            if self.ping.active and self.ping.circle_rect_collision(self.ping.origin, self.ping.radius, p.rect):
+                p.visible_timer = 10
+
+            if p.visible_timer > 0:
+                p.visible_timer -= 1
+                p.alpha = min(255, p.alpha + self.fade_speed)
+            else:
+                p.alpha = max(0, p.alpha - self.fade_speed)
+
+        for s in self.current_level.spikes:
+            if self.ping.active and self.ping.circle_rect_collision(self.ping.origin, self.ping.radius, s.rect):
+                s.visible_timer = 10
+
+            if s.visible_timer > 0:
+                s.visible_timer -= 1
+                s.alpha = min(255, s.alpha + self.fade_speed)
+            else:
+                s.alpha = max(0, s.alpha - self.fade_speed)
+        
+        for d in self.current_level.doors:
+            if self.ping.active and self.ping.circle_rect_collision(self.ping.origin, self.ping.radius, d.rect):
+                d.visible_timer = 10
+
+            if d.visible_timer > 0:
+                d.visible_timer -= 1
+                d.alpha = min(255, d.alpha + self.fade_speed)
+            else:
+                d.alpha = max(0, d.alpha - self.fade_speed)
+
+    # =========================================================
+    #                    COLLISIONS
+    # =========================================================
+    def check_collisions(self):
+        for s in self.current_level.spikes:
+            if self.player.rect.colliderect(s.rect):
+                self.running = False
+        
+        for d in self.current_level.doors:
+            if d.doorType == "exit" and self.player.rect.colliderect(d.rect):
+                next_level = self.level_manager.current_level + 1
+
+                if self.level_manager.get_level(next_level):
+                    self.current_level = self.level_manager.load(next_level)
+                    self.player = Player(*self.current_level.player_spawn)
+                else:
+                    print("No more levels!")
+                    self.running = False
+
+    # =========================================================
+    #                    MASK SYSTEM
+    # =========================================================
+    def apply_mask(self):
+        if self.ping.radius <= 0:
+            self.screen.fill(BLACK)
+            return
+
+        dark = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+        dark.fill((0, 0, 0, 255))
+
+        size = int(self.ping.radius * 2.3)
+        vignette = pygame.transform.smoothscale(self.vignette, (size, size))
+        rect = vignette.get_rect(center=self.ping.origin)
+
+        dark.blit(vignette, rect, special_flags=pygame.BLEND_RGBA_MULT)
+        self.screen.blit(dark, (0, 0))
+
+    def update_mask(self):
+        if not self.ping.active:
+            self.mask_closing = True
+
+        if self.mask_closing:
+            self.mask_timer += 1
+            if self.mask_timer >= self.MASK_DELAY:
+                self.mask_closing = False
+                self.ping.radius = 0
+
+    # =========================================================
+    #                      LEVEL LOGIC
+    # =========================================================
+    def update(self):
+        keys = pygame.key.get_pressed()
+
+        self.player.update(keys, self.current_level.platforms, self.ground_y)
+        self.ping.update()
+
+        self.check_collisions()
+        self.update_reveal()
+        self.update_mask()
+    
+    # =========================================================
+    #                      DRAW
+    # =========================================================
+    def draw(self):
+        self.screen.fill(BLACK)
+
+        # level
+        self.current_level.draw(self.screen)
+
+        # ping
+        self.ping.draw(self.screen)
+
+        self.apply_mask()
+
+        # player
+        self.player.draw(self.screen)
+
+    # =========================================================
+    #                      MAIN LOOP
+    # =========================================================
+    def main(self):
+        while self.running:
+            self.clock.tick(FPS)
+            
+            self.handle_events()
+
+            if self.state == "menu":
+                self.state = self.LEVEL
+            elif self.state == "level":
+                self.update()
+                self.draw()
+            elif self.state == self.GAME_OVER:
+                print("game over")
+
+            pygame.display.flip()
+
+        pygame.quit()
+        sys.exit()
+
+# =========================================================
+#                       RUN GAME
+# =========================================================
+if __name__ == "__main__":
+    Game().main()
