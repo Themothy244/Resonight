@@ -66,7 +66,6 @@ class Game:
             ],
             player_spawn=(120, 550),
             bg_path="assets/images/backgrounds/bg_2.png"
-
         )
 
         self.level_manager.add_level(1, level1)
@@ -90,6 +89,52 @@ class Game:
         self.vignette = pygame.image.load("assets/images/effects/Vignette.png").convert_alpha()
         self.sound = pygame.mixer.Sound("assets/sounds/Finger_snap.mp3")
 
+        # ================= MENU =================
+        self.font_title = pygame.font.SysFont("arial", 60)
+        self.font_btn = pygame.font.SysFont("arial", 35)
+
+        self.start_btn = pygame.Rect(WIDTH//2 - 120, HEIGHT//2, 240, 60)
+        self.quit_btn = pygame.Rect(WIDTH//2 - 120, HEIGHT//2 + 80, 240, 60)
+
+    # =========================================================
+    #                      MENU SCREEN
+    # =========================================================
+    def draw_menu(self):
+        self.screen.fill((10, 10, 20))
+        mouse_pos = pygame.mouse.get_pos()
+
+        # Title
+        title = self.font_title.render("Resonight", True, (255, 255, 255))
+        self.screen.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 3))
+
+        # START BUTTON
+        if self.start_btn.collidepoint(mouse_pos):
+            pygame.draw.rect(self.screen, (200, 200, 200), self.start_btn)
+            text_color = (0, 0, 0)
+        else:
+            pygame.draw.rect(self.screen, (100, 100, 100), self.start_btn)
+            text_color = (255, 255, 255)
+
+        start_text = self.font_btn.render("START", True, text_color)
+        self.screen.blit(start_text, (
+            self.start_btn.centerx - start_text.get_width() // 2,
+            self.start_btn.centery - start_text.get_height() // 2
+        ))
+
+        # QUIT BUTTON
+        if self.quit_btn.collidepoint(mouse_pos):
+            pygame.draw.rect(self.screen, (200, 100, 100), self.quit_btn)
+            text_color = (0, 0, 0)
+        else:
+            pygame.draw.rect(self.screen, (120, 50, 50), self.quit_btn)
+            text_color = (255, 255, 255)
+
+        quit_text = self.font_btn.render("QUIT", True, text_color)
+        self.screen.blit(quit_text, (
+            self.quit_btn.centerx - quit_text.get_width() // 2,
+            self.quit_btn.centery - quit_text.get_height() // 2
+        ))
+
     # =========================================================
     #                      EVENTS
     # =========================================================
@@ -97,7 +142,21 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-            if self.state == "level":
+
+            if self.state == self.MENU:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        self.state = self.LEVEL
+                    if event.key == pygame.K_ESCAPE:
+                        self.running = False
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if self.start_btn.collidepoint(event.pos):
+                        self.state = self.LEVEL
+                    if self.quit_btn.collidepoint(event.pos):
+                        self.running = False
+
+            elif self.state == self.LEVEL:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_e:
                         self.sound.play()
@@ -106,8 +165,9 @@ class Game:
                         self.mask_timer = 0
 
     # =========================================================
-    #                  REVEAL SYSTEM
+    # (rest of your code stays EXACTLY the same)
     # =========================================================
+
     def update_reveal(self):
         for p in self.current_level.platforms:
             if self.ping.active and self.ping.circle_rect_collision(self.ping.origin, self.ping.radius, p.rect):
@@ -139,13 +199,10 @@ class Game:
             else:
                 d.alpha = max(0, d.alpha - self.fade_speed)
 
-    # =========================================================
-    #                    COLLISIONS
-    # =========================================================
     def check_collisions(self):
         for s in self.current_level.spikes:
             if self.player.rect.colliderect(s.rect):
-                self.running = False
+                self.state = self.GAME_OVER
         
         for d in self.current_level.doors:
             if d.doorType == "exit" and self.player.rect.colliderect(d.rect):
@@ -155,12 +212,8 @@ class Game:
                     self.current_level = self.level_manager.load(next_level)
                     self.player = Player(*self.current_level.player_spawn)
                 else:
-                    print("No more levels!")
                     self.running = False
 
-    # =========================================================
-    #                    MASK SYSTEM
-    # =========================================================
     def apply_mask(self):
         if self.ping.radius <= 0:
             self.screen.fill(BLACK)
@@ -186,60 +239,38 @@ class Game:
                 self.mask_closing = False
                 self.ping.radius = 0
 
-    # =========================================================
-    #                      LEVEL LOGIC
-    # =========================================================
     def update(self):
         keys = pygame.key.get_pressed()
-
         self.player.update(keys, self.current_level.platforms, self.ground_y)
         self.ping.update()
-
         self.check_collisions()
         self.update_reveal()
         self.update_mask()
     
-    # =========================================================
-    #                      DRAW
-    # =========================================================
     def draw(self):
         self.screen.fill(BLACK)
-
-        # level
         self.current_level.draw(self.screen)
-
-        # ping
         self.ping.draw(self.screen)
-
         self.apply_mask()
-
-        # player
         self.player.draw(self.screen)
 
-    # =========================================================
-    #                      MAIN LOOP
-    # =========================================================
     def main(self):
         while self.running:
             self.clock.tick(FPS)
-            
             self.handle_events()
 
-            if self.state == "menu":
-                self.state = self.LEVEL
-            elif self.state == "level":
+            if self.state == self.MENU:
+                self.draw_menu()
+            elif self.state == self.LEVEL:
                 self.update()
                 self.draw()
             elif self.state == self.GAME_OVER:
-                print("game over")
+                self.screen.fill((20, 0, 0))
 
             pygame.display.flip()
 
         pygame.quit()
         sys.exit()
 
-# =========================================================
-#                       RUN GAME
-# =========================================================
 if __name__ == "__main__":
     Game().main()
