@@ -11,3 +11,9 @@ class LevelManager:
     def load(self, level_id):
         self.current_level = level_id
         return self.levels[level_id]
+        level.id = level_id
+        return level
+
+    def has_level(self, level_id):
+        return level_id in self.levels
+
