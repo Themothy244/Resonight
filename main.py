@@ -32,19 +32,25 @@ class Game:
         # ---------------- LEVEL 1 ----------------
         level1 = Level(
             platforms=[
-                Platform(0, 500, 800, 20),
-                Platform(160, 260, 800, 20),
-                Platform(830, 600, 130, 20),
-                Platform(0, 390, 130, 20),
+                Platform(160, 240, 800, 20),
+                Platform(0, 480, 800, 20),
+                Platform(830, 590, 130, 20),
+                Platform(0, 360, 130, 20),
             ],
             spikes=[
                 Spike(500, self.ground_y - 30, 30, 30),
                 Spike(530, self.ground_y - 30, 30, 30),
                 Spike(560, self.ground_y - 30, 30, 30),
+                Spike(360, 450, 30, 30),
+                Spike(390, 450, 30, 30),
+                Spike(420, 450, 30, 30),
+                Spike(560, 210, 30, 30),
+                Spike(590, 210, 30, 30),
+                Spike(620, 210, 30, 30),
             ],
             doors=[
                 Door(50, self.ground_y - 70, 50, 70, "entrance"),
-                Door(800, 190, 50, 70, "exit"),
+                Door(800, 170, 50, 70, "exit"),
             ],
             player_spawn=(100, self.ground_y - 70),
             bg_path="assets/images/backgrounds/bg_2.png"
@@ -74,7 +80,7 @@ class Game:
         self.current_level = self.level_manager.load(1)
 
         # ================= PLAYER =================
-        self.player = Player(*self.current_level.player_spawn)
+        self.player = Player(*self.current_level.player_spawn, 40, 40)
 
         # ================= PING =================
         self.ping = PingSystem((WIDTH, HEIGHT))
@@ -198,6 +204,9 @@ class Game:
             else:
                 d.alpha = max(0, d.alpha - self.fade_speed)
 
+    # =========================================================
+    #                    COLLISIONS
+    # =========================================================
     def check_collisions(self):
         for s in self.current_level.spikes:
             if self.player.rect.colliderect(s.rect):
@@ -212,6 +221,12 @@ class Game:
                     self.player = Player(*self.current_level.player_spawn)
                 else:
                     self.running = False
+
+        if self.player.rect.x >= WIDTH - self.player.rect.width:
+            self.player.rect.x = WIDTH - self.player.rect.width
+        
+        if self.player.rect.x <= 0:
+            self.player.rect.x = 0
 
     # =========================================================
     #                    MASK SYSTEM
