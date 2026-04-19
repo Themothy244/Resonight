@@ -191,6 +191,20 @@ class Game:
             self.next_level_btn.centerx - next_text.get_width() // 2,
             self.next_level_btn.centery - next_text.get_height() // 2
         ))
+        
+        # BACK BUTTON
+        if self.back_btn.collidepoint(mouse_pos):
+            pygame.draw.rect(self.screen, (200, 100, 100), self.back_btn)
+            text_color = (0, 0, 0)
+        else:
+            pygame.draw.rect(self.screen, (120, 50, 50), self.back_btn)
+            text_color = (255, 255, 255)
+
+        back_text = self.font_btn.render("BACK", True, text_color)
+        self.screen.blit(back_text, (
+            self.back_btn.centerx - back_text.get_width() // 2,
+            self.back_btn.centery - back_text.get_height() // 2
+        ))
 
     # =========================================================
     #                     LOSE MENU
@@ -271,7 +285,7 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.again_btn.collidepoint(event.pos):
                             self.current_level = self.level_manager.load(self.level_manager.current_level)
-                            self.player = Player(*self.current_level.player_spawn)
+                            self.player = Player(*self.current_level.player_spawn, 40, 40)
                             self.state = self.LEVEL
                     if self.back_btn.collidepoint(event.pos):
                         self.state = self.MENU
