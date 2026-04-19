@@ -20,6 +20,7 @@ class Game:
         self.clock = pygame.time.Clock()
         self.running = True
 
+        self.dark_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
         self.ground_y = HEIGHT - 40
 
         self.MENU = "menu"
@@ -177,10 +178,10 @@ class Game:
 
         # NEXT LEVEL BUTTON
         if self.next_level_btn.collidepoint(mouse_pos):
-            pygame.draw.rect(self.screen, (200, 200, 200), self.start_btn)
+            pygame.draw.rect(self.screen, (200, 200, 200), self.next_level_btn)
             text_color = (0, 0, 0)
         else:
-            pygame.draw.rect(self.screen, (100, 100, 100), self.start_btn)
+            pygame.draw.rect(self.screen, (100, 100, 100), self.next_level_btn)
             text_color = (255, 255, 255)
 
         next_text = self.font_btn.render("NEXT LEVEL", True, text_color)
@@ -251,42 +252,23 @@ class Game:
     #                  REVEAL SYSTEM
     # =========================================================
     def update_reveal(self):
-        for p in self.current_level.platforms:
-            if self.ping.active and self.ping.circle_rect_collision(self.ping.origin, self.ping.radius, p.rect):
-                p.visible_timer = 10
+        for obj in self.current_level.get_all_objects():
+            if self.ping.active and self.ping.circle_rect_collision(self.ping.origin, self.ping.radius, obj.rect):
+                obj.visible_timer = 10
 
-            if p.visible_timer > 0:
-                p.visible_timer -= 1
-                p.alpha = min(255, p.alpha + self.fade_speed)
+            if obj.visible_timer > 0:
+                obj.visible_timer -= 1
+                obj.alpha = min(255, obj.alpha + self.fade_speed)
             else:
-                p.alpha = max(0, p.alpha - self.fade_speed)
-
-        for s in self.current_level.spikes:
-            if self.ping.active and self.ping.circle_rect_collision(self.ping.origin, self.ping.radius, s.rect):
-                s.visible_timer = 10
-
-            if s.visible_timer > 0:
-                s.visible_timer -= 1
-                s.alpha = min(255, s.alpha + self.fade_speed)
-            else:
-                s.alpha = max(0, s.alpha - self.fade_speed)
-        
-        for d in self.current_level.doors:
-            if self.ping.active and self.ping.circle_rect_collision(self.ping.origin, self.ping.radius, d.rect):
-                d.visible_timer = 10
-
-            if d.visible_timer > 0:
-                d.visible_timer -= 1
-                d.alpha = min(255, d.alpha + self.fade_speed)
-            else:
-                d.alpha = max(0, d.alpha - self.fade_speed)
-
+                obj.alpha = max(0, obj.alpha - self.fade_speed)
+          
     # =========================================================
     #                    COLLISIONS
     # =========================================================
     def check_collisions(self):
         for s in self.current_level.spikes:
             if self.player.rect.colliderect(s.rect):
+                self.ping.reset()
                 self.state = self.GAME_OVER
         
         for d in self.current_level.doors:
@@ -294,11 +276,7 @@ class Game:
                 self.ping.reset()
                 self.state = self.WIN
 
-        if self.player.rect.x >= WIDTH - self.player.rect.width:
-            self.player.rect.x = WIDTH - self.player.rect.width
-        
-        if self.player.rect.x <= 0:
-            self.player.rect.x = 0
+        self.player.rect.x = max(0, min(self.player.rect.x, WIDTH - self.player.rect.width))
 
     # =========================================================
     #                    MASK SYSTEM
@@ -308,15 +286,14 @@ class Game:
             self.screen.fill(BLACK)
             return
 
-        dark = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-        dark.fill((0, 0, 0, 255))
+        self.dark_surface.fill((0, 0, 0, 255))
 
         size = int(self.ping.radius * 2.3)
         vignette = pygame.transform.smoothscale(self.vignette, (size, size))
         rect = vignette.get_rect(center=self.ping.origin)
 
-        dark.blit(vignette, rect, special_flags=pygame.BLEND_RGBA_MULT)
-        self.screen.blit(dark, (0, 0))
+        self.dark_surface.blit(vignette, rect, special_flags=pygame.BLEND_RGBA_MULT)
+        self.screen.blit(self.dark_surface, (0, 0))
 
     def update_mask(self):
         if not self.ping.active:
