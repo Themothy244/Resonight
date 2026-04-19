@@ -37,6 +37,14 @@ class PingSystem:
         self.alpha = 255
         self.fading = False
 
+    def reset(self):
+        self.radius = 0
+        self.growing = False
+        self.active = False
+        self.fading = False
+        self.timer = 0
+        self.alpha = 255
+
     def update(self):
         if not self.active:
             return
