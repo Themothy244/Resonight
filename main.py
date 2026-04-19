@@ -16,7 +16,7 @@ from levels.level_manager import LevelManager
 class Game:
     def __init__(self):
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
-        pygame.display.set_caption("Resonight Prototype")
+        pygame.display.set_caption("Resonight")
         self.clock = pygame.time.Clock()
         self.running = True
 
@@ -114,7 +114,7 @@ class Game:
     def load_next_level(self):
         next_id = self.current_level_id + 1
 
-        if self.level_manager.get_level(next_id):
+        if self.level_manager.has_level(next_id):
             self.current_level_id = next_id
 
             self.current_level = self.level_manager.load(next_id)
