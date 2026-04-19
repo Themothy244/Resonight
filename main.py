@@ -33,19 +33,25 @@ class Game:
         # ---------------- LEVEL 1 ----------------
         level1 = Level(
             platforms=[
-                Platform(0, 500, 800, 20),
-                Platform(160, 260, 800, 20),
-                Platform(830, 600, 130, 20),
-                Platform(0, 390, 130, 20),
+                Platform(160, 240, 800, 20),
+                Platform(0, 480, 800, 20),
+                Platform(830, 590, 130, 20),
+                Platform(0, 360, 130, 20),
             ],
             spikes=[
                 Spike(500, self.ground_y - 30, 30, 30),
                 Spike(530, self.ground_y - 30, 30, 30),
                 Spike(560, self.ground_y - 30, 30, 30),
+                Spike(360, 450, 30, 30),
+                Spike(390, 450, 30, 30),
+                Spike(420, 450, 30, 30),
+                Spike(560, 210, 30, 30),
+                Spike(590, 210, 30, 30),
+                Spike(620, 210, 30, 30),
             ],
             doors=[
                 Door(50, self.ground_y - 70, 50, 70, "entrance"),
-                Door(800, 190, 50, 70, "exit"),
+                Door(800, 170, 50, 70, "exit"),
             ],
             player_spawn=(100, self.ground_y - 70),
             bg_path="assets/images/backgrounds/bg_2.png"
@@ -68,14 +74,15 @@ class Game:
             player_spawn=(120, 550),
             bg_path="assets/images/backgrounds/bg_2.png"
         )
-
+        
         self.level_manager.add_level(1, level1)
         self.level_manager.add_level(2, level2)
 
-        self.current_level = self.level_manager.load(1)
+        self.current_level_id = 1
+        self.current_level = self.level_manager.load(self.current_level_id)
 
         # ================= PLAYER =================
-        self.player = Player(*self.current_level.player_spawn)
+        self.player = Player(*self.current_level.player_spawn, 40, 40)
 
         # ================= PING =================
         self.ping = PingSystem((WIDTH, HEIGHT))
@@ -104,11 +111,12 @@ class Game:
     #                   LOAD TO NEXT LEVEL
     # =========================================================
     def load_next_level(self):
-        next_id = self.current_level + 1
+        next_id = self.current_level_id + 1
 
-        if self.level_manager.has_level(next_level):
+        if self.level_manager.load(next_id):
             self.current_level = self.level_manager.load(next_id)
-            self.player = Player(*self.current_level.player_spawn)
+            self.player = Player(*self.current_level.player_spawn, 40, 40)
+
             self.state = self.LEVEL
         else:
             print("No more levels")
@@ -217,13 +225,7 @@ class Game:
             elif self.state == self.WIN:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.next_level_btn.collidepoint(event.pos):
-                        next_level = self.level_manager.current_level + 1
-                        if self.level_manager.has_level(next_level):
-                            self.current_level = self.level_manager.load(next_level)
-                            self.player = Player(*self.current_level.player_spawn)
-                            self.state = self.LEVEL
-                        else:
-                            self.state = self.MENU
+                        self.load_next_level()
 
                     if self.back_btn.collidepoint(event.pos):
                         self.state = self.MENU
@@ -270,6 +272,9 @@ class Game:
             else:
                 d.alpha = max(0, d.alpha - self.fade_speed)
 
+    # =========================================================
+    #                    COLLISIONS
+    # =========================================================
     def check_collisions(self):
         for s in self.current_level.spikes:
             if self.player.rect.colliderect(s.rect):
@@ -278,6 +283,12 @@ class Game:
         for d in self.current_level.doors:
             if d.doorType == "exit" and self.player.rect.colliderect(d.rect):
                 self.state = self.WIN
+
+        if self.player.rect.x >= WIDTH - self.player.rect.width:
+            self.player.rect.x = WIDTH - self.player.rect.width
+        
+        if self.player.rect.x <= 0:
+            self.player.rect.x = 0
 
     # =========================================================
     #                    MASK SYSTEM
