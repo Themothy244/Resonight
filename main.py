@@ -74,11 +74,12 @@ class Game:
             player_spawn=(120, 550),
             bg_path="assets/images/backgrounds/bg_2.png"
         )
-
+        
         self.level_manager.add_level(1, level1)
         self.level_manager.add_level(2, level2)
 
-        self.current_level = self.level_manager.load(1)
+        self.current_level_id = 1
+        self.current_level = self.level_manager.load(self.current_level_id)
 
         # ================= PLAYER =================
         self.player = Player(*self.current_level.player_spawn, 40, 40)
@@ -110,11 +111,12 @@ class Game:
     #                   LOAD TO NEXT LEVEL
     # =========================================================
     def load_next_level(self):
-        next_id = self.current_level + 1
+        next_id = self.current_level_id + 1
 
-        if self.level_manager.has_level(next_level):
+        if self.level_manager.load(next_id):
             self.current_level = self.level_manager.load(next_id)
-            self.player = Player(*self.current_level.player_spawn)
+            self.player = Player(*self.current_level.player_spawn, 40, 40)
+
             self.state = self.LEVEL
         else:
             print("No more levels")
@@ -223,13 +225,7 @@ class Game:
             elif self.state == self.WIN:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.next_level_btn.collidepoint(event.pos):
-                        next_level = self.level_manager.current_level + 1
-                        if self.level_manager.has_level(next_level):
-                            self.current_level = self.level_manager.load(next_level)
-                            self.player = Player(*self.current_level.player_spawn)
-                            self.state = self.LEVEL
-                        else:
-                            self.state = self.MENU
+                        self.load_next_level()
 
                     if self.back_btn.collidepoint(event.pos):
                         self.state = self.MENU
