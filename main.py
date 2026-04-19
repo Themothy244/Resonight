@@ -33,10 +33,10 @@ class Game:
         # ---------------- LEVEL 1 ----------------
         level1 = Level(
             platforms=[
-                Platform(0, 600, 200, 20),
-                Platform(300, 550, 150, 20),
-                Platform(500, 470, 200, 20),
-                Platform(350, 380, 120, 20),
+                Platform(0, 500, 800, 20),
+                Platform(160, 260, 800, 20),
+                Platform(830, 600, 130, 20),
+                Platform(0, 390, 130, 20),
             ],
             spikes=[
                 Spike(500, self.ground_y - 30, 30, 30),
@@ -44,10 +44,10 @@ class Game:
                 Spike(560, self.ground_y - 30, 30, 30),
             ],
             doors=[
-                Door(300, self.ground_y - 70, 50, 70, "entrance"),
-                Door(400, self.ground_y - 70, 50, 70, "exit"),
+                Door(50, self.ground_y - 70, 50, 70, "entrance"),
+                Door(800, 190, 50, 70, "exit"),
             ],
-            player_spawn=(100, 500),
+            player_spawn=(100, self.ground_y - 70),
             bg_path="assets/images/backgrounds/bg_2.png"
         )
 
@@ -237,9 +237,8 @@ class Game:
                         self.mask_timer = 0
 
     # =========================================================
-    # (rest of your code stays EXACTLY the same)
+    #                  REVEAL SYSTEM
     # =========================================================
-
     def update_reveal(self):
         for p in self.current_level.platforms:
             if self.ping.active and self.ping.circle_rect_collision(self.ping.origin, self.ping.radius, p.rect):
@@ -280,6 +279,9 @@ class Game:
             if d.doorType == "exit" and self.player.rect.colliderect(d.rect):
                 self.state = self.WIN
 
+    # =========================================================
+    #                    MASK SYSTEM
+    # =========================================================
     def apply_mask(self):
         if self.ping.radius <= 0:
             self.screen.fill(BLACK)
@@ -305,6 +307,9 @@ class Game:
                 self.mask_closing = False
                 self.ping.radius = 0
 
+    # =========================================================
+    #                   LEVEL LOGIC & DRAW
+    # =========================================================
     def update(self):
         keys = pygame.key.get_pressed()
         self.player.update(keys, self.current_level.platforms, self.ground_y)
@@ -320,6 +325,9 @@ class Game:
         self.apply_mask()
         self.player.draw(self.screen)
 
+    # =========================================================
+    #                      MAIN LOOP
+    # =========================================================
     def main(self):
         while self.running:
             self.clock.tick(FPS)
