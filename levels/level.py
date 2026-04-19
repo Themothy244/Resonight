@@ -21,3 +21,6 @@ class Level:
             s.draw(screen)
         for d in self.doors:
             d.draw(screen)
+    
+    def get_all_objects(self):
+        return self.platforms + self.spikes + self.doors
