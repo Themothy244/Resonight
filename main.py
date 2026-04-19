@@ -100,6 +100,8 @@ class Game:
         self.next_level_btn = pygame.Rect(WIDTH//2 - 120, HEIGHT//2, 240, 60)
         self.back_btn = pygame.Rect(WIDTH//2 - 120, HEIGHT//2 + 80, 240, 60)
 
+        self.again_btn = pygame.Rect(WIDTH//2 - 120, HEIGHT//2, 240, 60)
+
     # =========================================================
     #                   LOAD TO NEXT LEVEL
     # =========================================================
@@ -178,6 +180,31 @@ class Game:
             self.next_level_btn.centery - next_text.get_height() // 2
         ))
 
+    # =========================================================
+    #                     LOSE MENU
+    # =========================================================
+    def draw_game_over(self):
+        self.screen.fill((10, 10, 20))
+        mouse_pos = pygame.mouse.get_pos()
+
+        # LEVEL
+        title = self.font_title.render("You Lose", True, (255, 255, 255))
+        self.screen.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 3))
+
+        # TRY AGAIN BUTTON
+        if self.again_btn.collidepoint(mouse_pos):
+            pygame.draw.rect(self.screen, (200, 200, 200), self.again_btn)
+            text_color = (0, 0, 0)
+        else:
+            pygame.draw.rect(self.screen, (100, 100, 100), self.again_btn)
+            text_color = (255, 255, 255)
+
+        again_text = self.font_btn.render("RESTART", True, text_color)
+        self.screen.blit(again_text, (
+            self.again_btn.centerx - again_text.get_width() // 2,
+            self.again_btn.centery - again_text.get_height() // 2
+        ))
+
         # BACK BUTTON
         if self.back_btn.collidepoint(mouse_pos):
             pygame.draw.rect(self.screen, (200, 100, 100), self.back_btn)
@@ -225,6 +252,15 @@ class Game:
                         else:
                             self.state = self.MENU
 
+                    if self.back_btn.collidepoint(event.pos):
+                        self.state = self.MENU
+
+            elif self.state == self.GAME_OVER:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if self.again_btn.collidepoint(event.pos):
+                            self.current_level = self.level_manager.load(self.level_manager.current_level)
+                            self.player = Player(*self.current_level.player_spawn)
+                            self.state = self.LEVEL
                     if self.back_btn.collidepoint(event.pos):
                         self.state = self.MENU
 
@@ -340,6 +376,7 @@ class Game:
                 self.draw()
             elif self.state == self.GAME_OVER:
                 self.screen.fill((20, 0, 0))
+                self.draw_game_over()
             elif self.state == self.WIN:
                 self.draw_win()
 
