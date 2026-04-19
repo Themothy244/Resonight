@@ -113,13 +113,16 @@ class Game:
     def load_next_level(self):
         next_id = self.current_level_id + 1
 
-        if self.level_manager.load(next_id):
+        if self.level_manager.get_level(next_id):
+            self.current_level_id = next_id
+
             self.current_level = self.level_manager.load(next_id)
             self.player = Player(*self.current_level.player_spawn, 40, 40)
 
+            self.ping.reset()
             self.state = self.LEVEL
         else:
-            print("No more levels")
+            self.current_level_id = 1
             self.state = self.MENU
 
     # =========================================================
@@ -218,7 +221,13 @@ class Game:
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.start_btn.collidepoint(event.pos):
+                        self.current_level_id = 1
+                        self.current_level = self.level_manager.load(1)
+                        self.player = Player(*self.current_level.player_spawn, 40, 40)
+
+                        self.ping.reset()
                         self.state = self.LEVEL
+
                     if self.quit_btn.collidepoint(event.pos):
                         self.running = False
 
@@ -282,6 +291,7 @@ class Game:
         
         for d in self.current_level.doors:
             if d.doorType == "exit" and self.player.rect.colliderect(d.rect):
+                self.ping.reset()
                 self.state = self.WIN
 
         if self.player.rect.x >= WIDTH - self.player.rect.width:
