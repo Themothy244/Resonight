@@ -26,6 +26,7 @@ class Game:
         self.LEVEL = "level"
         self.GAME_OVER = "game_over"
         self.state = self.MENU
+        self.WIN = "win"
 
         self.level_manager = LevelManager()
 
@@ -102,6 +103,23 @@ class Game:
         self.start_btn = pygame.Rect(WIDTH//2 - 120, HEIGHT//2, 240, 60)
         self.quit_btn = pygame.Rect(WIDTH//2 - 120, HEIGHT//2 + 80, 240, 60)
 
+        self.next_level_btn = pygame.Rect(WIDTH//2 - 120, HEIGHT//2, 240, 60)
+        self.back_btn = pygame.Rect(WIDTH//2 - 120, HEIGHT//2 + 80, 240, 60)
+
+    # =========================================================
+    #                   LOAD TO NEXT LEVEL
+    # =========================================================
+    def load_next_level(self):
+        next_id = self.current_level + 1
+
+        if self.level_manager.has_level(next_level):
+            self.current_level = self.level_manager.load(next_id)
+            self.player = Player(*self.current_level.player_spawn)
+            self.state = self.LEVEL
+        else:
+            print("No more levels")
+            self.state = self.MENU
+
     # =========================================================
     #                      MENU SCREEN
     # =========================================================
@@ -142,6 +160,46 @@ class Game:
         ))
 
     # =========================================================
+    #                      WIN MENU
+    # =========================================================
+    def draw_win(self):
+        self.screen.fill((10, 10, 20))
+        mouse_pos = pygame.mouse.get_pos()
+
+        # LEVEL
+        title = self.font_title.render("Level Complete", True, (255, 255, 255))
+        self.screen.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 3))
+
+        # NEXT LEVEL BUTTON
+        if self.next_level_btn.collidepoint(mouse_pos):
+            pygame.draw.rect(self.screen, (200, 200, 200), self.start_btn)
+            text_color = (0, 0, 0)
+        else:
+            pygame.draw.rect(self.screen, (100, 100, 100), self.start_btn)
+            text_color = (255, 255, 255)
+
+        next_text = self.font_btn.render("NEXT LEVEL", True, text_color)
+        self.screen.blit(next_text, (
+            self.next_level_btn.centerx - next_text.get_width() // 2,
+            self.next_level_btn.centery - next_text.get_height() // 2
+        ))
+
+        # BACK BUTTON
+        if self.back_btn.collidepoint(mouse_pos):
+            pygame.draw.rect(self.screen, (200, 100, 100), self.back_btn)
+            text_color = (0, 0, 0)
+        else:
+            pygame.draw.rect(self.screen, (120, 50, 50), self.back_btn)
+            text_color = (255, 255, 255)
+
+        back_text = self.font_btn.render("BACK", True, text_color)
+        self.screen.blit(back_text, (
+            self.back_btn.centerx - back_text.get_width() // 2,
+            self.back_btn.centery - back_text.get_height() // 2
+        ))
+
+    
+    # =========================================================
     #                      EVENTS
     # =========================================================
     def handle_events(self):
@@ -161,6 +219,20 @@ class Game:
                         self.state = self.LEVEL
                     if self.quit_btn.collidepoint(event.pos):
                         self.running = False
+
+            elif self.state == self.WIN:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if self.next_level_btn.collidepoint(event.pos):
+                        next_level = self.level_manager.current_level + 1
+                        if self.level_manager.has_level(next_level):
+                            self.current_level = self.level_manager.load(next_level)
+                            self.player = Player(*self.current_level.player_spawn)
+                            self.state = self.LEVEL
+                        else:
+                            self.state = self.MENU
+
+                    if self.back_btn.collidepoint(event.pos):
+                        self.state = self.MENU
 
             elif self.state == self.LEVEL:
                 if event.type == pygame.KEYDOWN:
@@ -214,13 +286,7 @@ class Game:
         
         for d in self.current_level.doors:
             if d.doorType == "exit" and self.player.rect.colliderect(d.rect):
-                next_level = self.level_manager.current_level + 1
-
-                if self.level_manager.get_level(next_level):
-                    self.current_level = self.level_manager.load(next_level)
-                    self.player = Player(*self.current_level.player_spawn)
-                else:
-                    self.running = False
+                self.state = self.WIN
 
         if self.player.rect.x >= WIDTH - self.player.rect.width:
             self.player.rect.x = WIDTH - self.player.rect.width
@@ -289,6 +355,8 @@ class Game:
                 self.draw()
             elif self.state == self.GAME_OVER:
                 self.screen.fill((20, 0, 0))
+            elif self.state == self.WIN:
+                self.draw_win()
 
             pygame.display.flip()
 
