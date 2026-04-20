@@ -103,16 +103,6 @@ class Game:
 
         # ================= MENU =================
         self.mouse_pos = pygame.mouse.get_pos()
-        # self.font_title = pygame.font.SysFont("arial", 60)
-        # self.font_btn = pygame.font.SysFont("arial", 35)
-
-        # self.start_btn = pygame.Rect(WIDTH//2 - 120, HEIGHT//2, 240, 60)
-        # self.quit_btn = pygame.Rect(WIDTH//2 - 120, HEIGHT//2 + 80, 240, 60)
-
-        # self.next_level_btn = pygame.Rect(WIDTH//2 - 120, HEIGHT//2, 240, 60)
-        # self.back_btn = pygame.Rect(WIDTH//2 - 120, HEIGHT//2 + 80, 240, 60)
-
-        # self.again_btn = pygame.Rect(WIDTH//2 - 120, HEIGHT//2, 240, 60)
 
         self.nextlevel = Screens(self.screen, self.mouse_pos, self.level_manager.current_level, self.timeLeft, self.totalPings)
 
@@ -134,110 +124,8 @@ class Game:
             self.current_level_id = 1
             self.state = self.MENU
 
-    # =========================================================
-    #                      MENU SCREEN
-    # =========================================================
-    # def draw_menu(self):
-    #     self.screen.fill((10, 10, 20))
-    #     mouse_pos = pygame.mouse.get_pos()
-
-    #     # Title
-    #     title = self.font_title.render("Resonight", True, (255, 255, 255))
-    #     self.screen.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 3))
-
-    #     # START BUTTON
-    #     if self.start_btn.collidepoint(mouse_pos):
-    #         pygame.draw.rect(self.screen, (200, 200, 200), self.start_btn)
-    #         text_color = (0, 0, 0)
-    #     else:
-    #         pygame.draw.rect(self.screen, (100, 100, 100), self.start_btn)
-    #         text_color = (255, 255, 255)
-
-    #     start_text = self.font_btn.render("START", True, text_color)
-    #     self.screen.blit(start_text, (
-    #         self.start_btn.centerx - start_text.get_width() // 2,
-    #         self.start_btn.centery - start_text.get_height() // 2
-    #     ))
-
-    #     # QUIT BUTTON
-    #     if self.quit_btn.collidepoint(mouse_pos):
-    #         pygame.draw.rect(self.screen, (200, 100, 100), self.quit_btn)
-    #         text_color = (0, 0, 0)
-    #     else:
-    #         pygame.draw.rect(self.screen, (120, 50, 50), self.quit_btn)
-    #         text_color = (255, 255, 255)
-
-    #     quit_text = self.font_btn.render("QUIT", True, text_color)
-    #     self.screen.blit(quit_text, (
-    #         self.quit_btn.centerx - quit_text.get_width() // 2,
-    #         self.quit_btn.centery - quit_text.get_height() // 2
-    #     ))
-
-    # # =========================================================
-    # #                      WIN MENU
-    # # =========================================================
-    # def draw_win(self):
-    #     self.screen.fill((10, 10, 20))
-    #     mouse_pos = pygame.mouse.get_pos()
-
-    #     # LEVEL
-    #     title = self.font_title.render("Level Complete", True, (255, 255, 255))
-    #     self.screen.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 3))
-
-    #     # NEXT LEVEL BUTTON
-    #     if self.next_level_btn.collidepoint(mouse_pos):
-    #         pygame.draw.rect(self.screen, (200, 200, 200), self.next_level_btn)
-    #         text_color = (0, 0, 0)
-    #     else:
-    #         pygame.draw.rect(self.screen, (100, 100, 100), self.next_level_btn)
-    #         text_color = (255, 255, 255)
-
-    #     next_text = self.font_btn.render("NEXT LEVEL", True, text_color)
-    #     self.screen.blit(next_text, (
-    #         self.next_level_btn.centerx - next_text.get_width() // 2,
-    #         self.next_level_btn.centery - next_text.get_height() // 2
-    #     ))
-
-    # # =========================================================
-    # #                     LOSE MENU
-    # # =========================================================
-    # def draw_game_over(self):
-    #     self.screen.fill((10, 10, 20))
-    #     mouse_pos = pygame.mouse.get_pos()
-
-    #     # LEVEL
-    #     title = self.font_title.render("You Lose", True, (255, 255, 255))
-    #     self.screen.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 3))
-
-    #     # TRY AGAIN BUTTON
-    #     if self.again_btn.collidepoint(mouse_pos):
-    #         pygame.draw.rect(self.screen, (200, 200, 200), self.again_btn)
-    #         text_color = (0, 0, 0)
-    #     else:
-    #         pygame.draw.rect(self.screen, (100, 100, 100), self.again_btn)
-    #         text_color = (255, 255, 255)
-
-    #     again_text = self.font_btn.render("RESTART", True, text_color)
-    #     self.screen.blit(again_text, (
-    #         self.again_btn.centerx - again_text.get_width() // 2,
-    #         self.again_btn.centery - again_text.get_height() // 2
-    #     ))
-
-    #     # BACK BUTTON
-    #     if self.back_btn.collidepoint(mouse_pos):
-    #         pygame.draw.rect(self.screen, (200, 100, 100), self.back_btn)
-    #         text_color = (0, 0, 0)
-    #     else:
-    #         pygame.draw.rect(self.screen, (120, 50, 50), self.back_btn)
-    #         text_color = (255, 255, 255)
-
-    #     back_text = self.font_btn.render("BACK", True, text_color)
-    #     self.screen.blit(back_text, (
-    #         self.back_btn.centerx - back_text.get_width() // 2,
-    #         self.back_btn.centery - back_text.get_height() // 2
-    #     ))
-
     
+
     # =========================================================
     #                      EVENTS
     # =========================================================
@@ -256,7 +144,7 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.nextlevel.start_btn.collidepoint(event.pos):
                         self.current_level_id = 1
-                        self.current_level = self.level_manager.load(2)
+                        self.current_level = self.level_manager.load(1)
                         self.player = Player(*self.current_level.player_spawn, 40, 40)
 
                         self.ping.reset()
