@@ -54,8 +54,7 @@ class Game:
                 Platform(100, 650, 250, 20),
                 Platform(400, 580, 200, 20),
                 Platform(650, 500, 180, 20),
-                Platform(650, 500, 180, 20),
-
+                
             ],
             spikes=[
                 Spike(420, 650, 30, 30),
