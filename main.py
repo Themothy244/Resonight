@@ -401,18 +401,22 @@ class Game:
                     self.transition_alpha = 0
 
     def draw_ui(self):
-        font = pygame.font.SysFont("arial", 24)
+        font_inter = pygame.font.SysFont("Inter", 50, bold=True)
+        font_arial = pygame.font.SysFont("arial", 32)
 
         # LEFT: LEVEL
-        level_text = font.render(f"Level: {self.current_level_id}", True, (255, 255, 255))
+        level_text = font_arial.render(f"Level: {self.current_level_id}", True, (255, 255, 255))
         self.screen.blit(level_text, (10, 10))
 
         # CENTER: TIMER (0.00 format)
-        timer_text = font.render(f"{self.timeLeft:0.2f}", True, (255, 255, 255))
+        minutes = int(self.timeLeft) // 60
+        seconds = int(self.timeLeft) % 60
+
+        timer_text = font_inter.render(f"{minutes:02d}:{seconds:02d}", True, (255, 255, 255))
         self.screen.blit(timer_text, (WIDTH//2 - timer_text.get_width()//2, 10))
 
         # RIGHT: PINGS
-        ping_text = font.render(f"Pings: {self.totalPings}", True, (255, 255, 255))
+        ping_text = font_arial.render(f"Pings: {self.totalPings}", True, (255, 255, 255))
         self.screen.blit(ping_text, (WIDTH - ping_text.get_width() - 10, 10))
     # =========================================================
     #                   LEVEL LOGIC & DRAW
