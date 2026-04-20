@@ -7,10 +7,16 @@ class Door:
         self.alpha = 0
         self.visible_timer = 0
         self.doorType = door_type
-        self.surface = pygame.Surface((width, height))
-        self.surface.fill(WHITE)
+        # self.surface = pygame.Surface((width, height))
+        # self.surface.fill(WHITE)
+        if self.doorType == "exit":
+            self.bg = pygame.image.load("assets/images/entities/Exit_door.png").convert()
+        else:
+            self.bg = pygame.image.load("assets/images/entities/Entrance_door.png").convert()
+
+        self.bg = pygame.transform.scale(self.bg, (width, height))
 
     def draw(self, screen):
         if self.alpha > 0:
-            self.surface.set_alpha(int(self.alpha))
-            screen.blit(self.surface, self.rect.topleft)
+            self.bg.set_alpha(int(self.alpha))
+            screen.blit(self.bg, self.rect.topleft)

@@ -12,7 +12,7 @@ from entities.player import Player
 from systems.ping import PingSystem
 from levels.level import Level
 from levels.level_manager import LevelManager
-from levels.nextlevel import Screens
+from levels.screens import Screens
 
 class Game:
     def __init__(self):
@@ -54,8 +54,8 @@ class Game:
                 Spike(620, 210, 30, 30),
             ],
             doors=[
-                Door(50, self.ground_y - 70, 50, 70, "entrance"),
-                Door(800, 170, 50, 70, "exit"),
+                Door(50, self.ground_y - 80, 60, 80, "entrance"),
+                Door(800, 160, 60, 80, "exit"),
             ],
             player_spawn=(100, self.ground_y - 70),
             bg_path="assets/images/backgrounds/bg_2.png"
