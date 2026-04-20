@@ -70,7 +70,7 @@ class Screens:
         title = self.font_title.render(f"Level {self.currentlevel} Complete", True, (255, 255, 255))
         self.screen.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 6))
 
-        time = self.font_time.render(f"Total Time left: {self.timeLeft}", True, (255, 255, 255))
+        time = self.font_time.render(f"Total Time left: {self.timeLeft:0.2f}", True, (255, 255, 255))
         self.screen.blit(time, (WIDTH // 2 - time.get_width() // 2, HEIGHT // 3 + 10))
 
         ping = self.font_ping.render(f"Total Ping  Left: {self.totalPings}", True, (255, 255, 255))
@@ -110,7 +110,14 @@ class Screens:
         self.screen.fill((10, 10, 20))
 
         # LEVEL
-        title = self.font_title.render("You Lose", True, (255, 255, 255))
+        if self.currentlevel == "time":
+            message = "Your light faded into silence..."
+        elif self.currentlevel == "spike":
+            message = "The darkness bit back."
+        else:
+            message = "You Lose"
+
+        title = self.font_title.render(message, True, (255, 255, 255))
         self.screen.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 3))
 
         # TRY AGAIN BUTTON

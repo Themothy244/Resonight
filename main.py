@@ -29,8 +29,9 @@ class Game:
         self.GAME_OVER = "game_over"
         self.state = self.MENU
         self.WIN = "win"
-        self.timeLeft = 0.05
-        self.totalPings = 3
+        self.timeLeft = 30.0
+        self.totalPings = 0
+        self.deathReason = ""
 
         # ================= TRANSITION =================
         self.transitioning = False
@@ -126,6 +127,8 @@ class Game:
     # =========================================================
     def load_next_level(self):
         next_id = self.current_level_id + 1
+        self.timeLeft = 30.0
+        self.totalPings = 0
 
         if self.level_manager.has_level(next_id):
             self.current_level_id = next_id
@@ -183,7 +186,15 @@ class Game:
                     if self.nextlevel.again_btn.collidepoint(event.pos):
                             self.current_level = self.level_manager.load(self.level_manager.current_level)
                             self.player = Player(*self.current_level.player_spawn, 40, 40)
+
+                            self.timeLeft = 30.0
+                            self.totalPings = 0
+                            self.deathReason = ""
+
+                            self.ping.reset()
+
                             self.start_transition(self.LEVEL)
+
                     if self.nextlevel.back_btn.collidepoint(event.pos):
                         self.start_transition(self.MENU)
 
@@ -192,6 +203,13 @@ class Game:
                     if event.key == pygame.K_e:
                         self.sound.play()
                         self.ping.trigger(self.player.rect.center)
+
+                        self.totalPings += 1
+
+                        self.timeLeft -= 3
+                        if self.timeLeft < 0:
+                            self.timeLeft = 0
+
                         self.mask_closing = False
                         self.mask_timer = 0
 
@@ -219,6 +237,7 @@ class Game:
         for s in self.current_level.spikes:
             if self.player.rect.colliderect(s.rect):
                 self.ping.reset()
+                self.deathReason = "spike"
                 self.start_transition(self.GAME_OVER)
         
         for d in self.current_level.doors:
@@ -268,10 +287,35 @@ class Game:
                     self.transitioning = False
                     self.transition_alpha = 0
 
+    def draw_ui(self):
+        font = pygame.font.SysFont("arial", 24)
+
+        # LEFT: LEVEL
+        level_text = font.render(f"Level: {self.current_level_id}", True, (255, 255, 255))
+        self.screen.blit(level_text, (10, 10))
+
+        # CENTER: TIMER (0.00 format)
+        timer_text = font.render(f"{self.timeLeft:0.2f}", True, (255, 255, 255))
+        self.screen.blit(timer_text, (WIDTH//2 - timer_text.get_width()//2, 10))
+
+        # RIGHT: PINGS
+        ping_text = font.render(f"Pings: {self.totalPings}", True, (255, 255, 255))
+        self.screen.blit(ping_text, (WIDTH - ping_text.get_width() - 10, 10))
     # =========================================================
     #                   LEVEL LOGIC & DRAW
     # =========================================================
     def update(self):
+        dt = self.clock.get_time() / 1000  # seconds
+        # countdown
+        self.timeLeft -= dt
+
+        # if time runs out → GAME OVER
+        if self.timeLeft <= 0:
+            self.timeLeft = 0
+            self.deathReason = "time"
+            self.start_transition(self.GAME_OVER)
+            return
+        
         keys = pygame.key.get_pressed()
         self.player.update(keys, self.current_level.platforms, self.ground_y)
         self.ping.update()
@@ -285,6 +329,7 @@ class Game:
         self.ping.draw(self.screen)
         self.apply_mask()
         self.player.draw(self.screen)
+        self.draw_ui() 
 
     # =========================================================
     #                      MAIN LOOP
@@ -297,15 +342,21 @@ class Game:
 
             if self.state == self.MENU:
                 self.nextlevel.draw_menu()
+
             elif self.state == self.LEVEL:
                 if not self.transitioning:
                     self.update()
                 self.draw()
+
             elif self.state == self.GAME_OVER:
                 self.screen.fill((20, 0, 0))
+                self.nextlevel.currentlevel = self.deathReason
                 self.nextlevel.draw_game_over()
+
             elif self.state == self.WIN:
                 self.nextlevel.currentlevel = self.level_manager.current_level
+                self.nextlevel.timeLeft = self.timeLeft
+                self.nextlevel.totalPings = self.totalPings
                 self.nextlevel.draw_win()
 
             if self.transitioning:
