@@ -79,7 +79,7 @@ class Screens:
         time = self.font_time.render(f"Total Time left: {self.timeLeft:0.2f}", True, (255, 255, 255))
         self.screen.blit(time, (WIDTH // 2 - time.get_width() // 2, HEIGHT // 3 + 10))
 
-        ping = self.font_ping.render(f"Total Ping  Left: {self.totalPings}", True, (255, 255, 255))
+        ping = self.font_ping.render(f"Total Ping: {self.totalPings}", True, (255, 255, 255))
         self.screen.blit(ping, (WIDTH // 2 - ping.get_width() // 2, HEIGHT // 3 + 40))
 
         # ONLY SHOW IF NEXT LEVEL EXISTS
