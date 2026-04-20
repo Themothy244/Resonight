@@ -32,6 +32,14 @@ class Game:
         self.timeLeft = 0.05
         self.totalPings = 3
 
+        # ================= TRANSITION =================
+        self.transitioning = False
+        self.transition_alpha = 0
+        self.transition_duration = 1.25  # seconds
+        self.transition_speed = 255 / (FPS * self.transition_duration)
+        self.target_state = None
+        self.fade_out = False
+
         self.level_manager = LevelManager()
 
         # ---------------- LEVEL 1 ----------------
@@ -106,6 +114,13 @@ class Game:
 
         self.nextlevel = Screens(self.screen, self.mouse_pos, self.level_manager.current_level, self.timeLeft, self.totalPings)
 
+    def start_transition(self, new_state):
+        if not self.transitioning:
+            self.transitioning = True
+            self.target_state = new_state
+            self.transition_alpha = 0
+            self.fade_out = True
+
     # =========================================================
     #                   LOAD TO NEXT LEVEL
     # =========================================================
@@ -119,10 +134,10 @@ class Game:
             self.player = Player(*self.current_level.player_spawn, 40, 40)
 
             self.ping.reset()
-            self.state = self.LEVEL
+            self.start_transition(self.LEVEL)
         else:
             self.current_level_id = 1
-            self.state = self.MENU
+            self.start_transition(self.MENU)
 
     
 
@@ -137,7 +152,7 @@ class Game:
             if self.state == self.MENU:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
-                        self.state = self.LEVEL
+                        self.start_transition(self.LEVEL)
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
 
@@ -148,7 +163,7 @@ class Game:
                         self.player = Player(*self.current_level.player_spawn, 40, 40)
 
                         self.ping.reset()
-                        self.state = self.LEVEL
+                        self.start_transition(self.LEVEL)
 
                     if self.nextlevel.quit_btn.collidepoint(event.pos):
                         self.running = False
@@ -159,16 +174,16 @@ class Game:
                         self.load_next_level()
 
                     if self.nextlevel.back_btn.collidepoint(event.pos):
-                        self.state = self.MENU
+                        self.start_transition(self.MENU)
 
             elif self.state == self.GAME_OVER:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.nextlevel.again_btn.collidepoint(event.pos):
                             self.current_level = self.level_manager.load(self.level_manager.current_level)
                             self.player = Player(*self.current_level.player_spawn, 40, 40)
-                            self.state = self.LEVEL
+                            self.start_transition(self.LEVEL)
                     if self.nextlevel.back_btn.collidepoint(event.pos):
-                        self.state = self.MENU
+                        self.start_transition(self.MENU)
 
             elif self.state == self.LEVEL:
                 if event.type == pygame.KEYDOWN:
@@ -199,12 +214,12 @@ class Game:
         for s in self.current_level.spikes:
             if self.player.rect.colliderect(s.rect):
                 self.ping.reset()
-                self.state = self.GAME_OVER
+                self.start_transition(self.GAME_OVER)
         
         for d in self.current_level.doors:
             if d.doorType == "exit" and self.player.rect.colliderect(d.rect):
                 self.ping.reset()
-                self.state = self.WIN
+                self.start_transition(self.WIN)
 
         self.player.rect.x = max(0, min(self.player.rect.x, WIDTH - self.player.rect.width))
 
@@ -235,6 +250,19 @@ class Game:
                 self.mask_closing = False
                 self.ping.radius = 0
 
+    def update_transition(self):
+        if self.transitioning:
+            if self.fade_out:
+                self.transition_alpha += self.transition_speed
+                if self.transition_alpha >= 255:
+                    self.state = self.target_state
+                    self.fade_out = False
+            else:
+                self.transition_alpha -= self.transition_speed
+                if self.transition_alpha <= 0:
+                    self.transitioning = False
+                    self.transition_alpha = 0
+
     # =========================================================
     #                   LEVEL LOGIC & DRAW
     # =========================================================
@@ -260,6 +288,7 @@ class Game:
         while self.running:
             self.clock.tick(FPS)
             self.handle_events()
+            self.update_transition()
 
             if self.state == self.MENU:
                 self.nextlevel.draw_menu()
@@ -272,6 +301,11 @@ class Game:
             elif self.state == self.WIN:
                 self.nextlevel.currentlevel = self.level_manager.current_level
                 self.nextlevel.draw_win()
+
+            if self.transitioning:
+                transition_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+                transition_surface.fill((0, 0, 0, int(self.transition_alpha)))
+                self.screen.blit(transition_surface, (0, 0))
 
             pygame.display.flip()
 
