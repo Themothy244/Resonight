@@ -35,7 +35,7 @@ class Game:
         # ================= TRANSITION =================
         self.transitioning = False
         self.transition_alpha = 0
-        self.transition_duration = 1.25  # seconds
+        self.transition_duration = 0.7  # seconds
         self.transition_speed = 255 / (FPS * self.transition_duration)
         self.target_state = None
         self.fade_out = False
@@ -145,6 +145,8 @@ class Game:
     #                      EVENTS
     # =========================================================
     def handle_events(self):
+        if self.transitioning:
+            return
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
@@ -211,6 +213,9 @@ class Game:
     #                    COLLISIONS
     # =========================================================
     def check_collisions(self):
+        if self.transitioning:
+            return
+        
         for s in self.current_level.spikes:
             if self.player.rect.colliderect(s.rect):
                 self.ping.reset()
@@ -293,7 +298,8 @@ class Game:
             if self.state == self.MENU:
                 self.nextlevel.draw_menu()
             elif self.state == self.LEVEL:
-                self.update()
+                if not self.transitioning:
+                    self.update()
                 self.draw()
             elif self.state == self.GAME_OVER:
                 self.screen.fill((20, 0, 0))
