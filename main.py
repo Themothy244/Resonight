@@ -108,17 +108,26 @@ class Game:
         # ---------------- LEVEL 4 ----------------
         level4 = Level(
             platforms=[
-                Platform(100, 650, 250, 20),
-                Platform(400, 580, 200, 20),
-                Platform(650, 500, 180, 20),
+                Platform(0, 400, 200, 20),
+                Platform(250, 500, 350, 20),
+                Platform(740, 600, 150, 20),
+                Platform(360, 250, 630, 20),
             ],
             spikes=[
-                Spike(420, 650, 30, 30),
-                Spike(450, 650, 30, 30),
+                Spike(580, 650, 30, 30),
+                Spike(550, 650, 30, 30),
+                Spike(520, 650, 30, 30),
+                Spike(740, 570, 30, 30),
+                Spike(440, 470, 30, 30),
+                Spike(410, 470, 30, 30),
+                Spike(380, 470, 30, 30),
+                Spike(630, 220, 30, 30),
+                Spike(600, 220, 30, 30),
+                Spike(570, 220, 30, 30),
             ],
             doors=[
                 Door(50, self.ground_y - 80, 60, 80, "entrance"),
-                Door(650, 430, 50, 70, "exit"),
+                Door(800, 180, 50, 70, "exit"),
             ],
             player_spawn=(120, 550),
             bg_path="assets/images/backgrounds/bg_2.png"
