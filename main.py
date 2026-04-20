@@ -51,18 +51,19 @@ class Game:
         # ---------------- LEVEL 1 ----------------
         level1 = Level(
             platforms=[
-                Platform(100, 650, 250, 20),
-                Platform(100, 580, 200, 20),
-                Platform(650, 500, 180, 20),
+                Platform(190, 550, 390, 20),
+                Platform(548, 420, 530, 20),
                 
             ],
             spikes=[
-                Spike(420, 650, 30, 30),
-                Spike(450, 650, 30, 30),
+                Spike(420, 520, 30, 30),
+                Spike(450, 520, 30, 30),
+                Spike(480, 520, 30, 30),
+
             ],
             doors=[
                 Door(50, self.ground_y - 80, 60, 80, "entrance"),
-                Door(650, 430, 50, 70, "exit"),
+                Door(830, 350, 54, 70, "exit"),
             ],
             player_spawn=(120, 550),
             bg_path="assets/images/backgrounds/bg_2.png"
