@@ -55,17 +55,11 @@ class Game:
                 Platform(548, 420, 530, 20),
                 
             ],
-<<<<<<< HEAD
-            spikes=[    
-                Spike(420, 650, 30, 30),
-                Spike(450, 650, 30, 30),
-=======
             spikes=[
                 Spike(420, 520, 30, 30),
                 Spike(450, 520, 30, 30),
                 Spike(480, 520, 30, 30),
 
->>>>>>> 59eccc0e51c5dedda769815608f06502f11725cb
             ],
             doors=[
                 Door(50, self.ground_y - 80, 60, 80, "entrance"),
@@ -265,7 +259,7 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.nextlevel.start_btn.collidepoint(event.pos):
                         self.current_level_id = 1
-                        self.current_level = self.level_manager.load(3)
+                        self.current_level = self.level_manager.load(1)
                         self.player = Player(*self.current_level.player_spawn, 40, 40)
 
                         self.ping.reset()
