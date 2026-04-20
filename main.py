@@ -51,14 +51,14 @@ class Game:
         # ---------------- LEVEL 1 ----------------
         level1 = Level(
             platforms=[
-                Platform(190, 550, 390, 20),
-                Platform(548, 420, 530, 20),
+                Platform(220, 550, 390, 20),
+                Platform(550, 420, 530, 20),
                 
             ],
             spikes=[
-                Spike(420, 520, 30, 30),
-                Spike(450, 520, 30, 30),
-                Spike(480, 520, 30, 30),
+                Spike(440, 520, 30, 30),
+                Spike(470, 520, 30, 30),
+                Spike(500, 520, 30, 30),
 
             ],
             doors=[
@@ -72,17 +72,16 @@ class Game:
         # ---------------- LEVEL 2 ----------------
         level2 = Level(
             platforms=[
-                Platform(80, 650, 180, 20),
-                Platform(300, 600, 150, 20),
-                Platform(500, 550, 120, 20),
-                Platform(700, 480, 100, 20),
+                Platform(300, 600, 140, 20),
+                Platform(500, 550, 140, 20),
+                Platform(700, 480, 140, 20),
                 Platform(850, 420, 140, 20),
             ],
             spikes=[
-                Spike(260, 650, 30, 30),
+                Spike(240, 650, 30, 30),
                 Spike(530, 650, 30, 30),
-                 Spike(560, 650, 30, 30),
-                  Spike(720, 450, 30, 30),
+                Spike(560, 650, 30, 30),
+                Spike(700, 450, 30, 30),
             ],
             doors=[
                 Door(50, self.ground_y - 80, 60, 80, "entrance"),
@@ -94,13 +93,11 @@ class Game:
         # ---------------- LEVEL 3 ----------------
         level3 = Level(
             platforms=[
-                Platform(180, 540, 180, 20),
-                Platform(580, 540, 165, 20),
-                Platform(420, 400, 150, 20),
+                Platform(220, 540, 180, 20),
+                Platform(600, 540, 165, 20),
+                Platform(450, 400, 150, 20),
             ],
             spikes=[
-                
-                Spike(180, 650, 30, 30),
                 Spike(210, 650, 30, 30),
                 Spike(240, 650, 30, 30),
                 Spike(270, 650, 30, 30),
@@ -121,7 +118,6 @@ class Game:
                 Spike(690, 650, 30, 30),
                 Spike(720, 650, 30, 30),
                 Spike(750, 650, 30, 30),
-                Spike(780, 650, 30, 30),
             ],
             doors=[
                 Door(50, self.ground_y - 80, 60, 80, "entrance"),
@@ -133,17 +129,26 @@ class Game:
         # ---------------- LEVEL 4 ----------------
         level4 = Level(
             platforms=[
-                Platform(100, 650, 250, 20),
-                Platform(400, 580, 200, 20),
-                Platform(650, 500, 180, 20),
+                Platform(0, 360, 200, 20),
+                Platform(250, 480, 350, 20),
+                Platform(680, 560, 150, 20),
+                Platform(360, 250, 630, 20),
             ],
             spikes=[
-                Spike(420, 650, 30, 30),
-                Spike(450, 650, 30, 30),
+                Spike(560, 650, 30, 30),
+                Spike(530, 650, 30, 30),
+                Spike(500, 650, 30, 30),
+                Spike(680, 530, 30, 30),
+                Spike(440, 450, 30, 30),
+                Spike(410, 450, 30, 30),
+                Spike(380, 450, 30, 30),
+                Spike(630, 220, 30, 30),
+                Spike(600, 220, 30, 30),
+                Spike(570, 220, 30, 30),
             ],
             doors=[
                 Door(50, self.ground_y - 80, 60, 80, "entrance"),
-                Door(650, 430, 50, 70, "exit"),
+                Door(800, 180, 50, 70, "exit"),
             ],
             player_spawn=(120, 550),
             bg_path="assets/images/backgrounds/bg_2.png"
@@ -320,9 +325,7 @@ class Game:
     # =========================================================
     def update_reveal(self):
         for obj in self.current_level.get_all_objects():
-            # if self.ping.active and self.ping.circle_rect_collision(self.ping.origin, self.ping.radius, obj.rect):
-            if True:
-
+            if self.ping.active and self.ping.circle_rect_collision(self.ping.origin, self.ping.radius, obj.rect):
                 obj.visible_timer = 10
 
             if obj.visible_timer > 0:
@@ -437,7 +440,7 @@ class Game:
         self.screen.fill(BLACK)
         self.current_level.draw(self.screen)
         self.ping.draw(self.screen)
-        # self.apply_mask()
+        self.apply_mask()
         self.player.draw(self.screen)
         self.draw_ui() 
 
