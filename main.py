@@ -32,6 +32,11 @@ class Game:
         self.timeLeft = 30.0
         self.totalPings = 0
         self.deathReason = ""
+        self.win_level = 0
+        self.win_time = 0
+        self.win_pings = 0
+
+        self.hasNextLevel = True
 
         # ================= TRANSITION =================
         self.transitioning = False
@@ -87,9 +92,63 @@ class Game:
             player_spawn=(120, 550),
             bg_path="assets/images/backgrounds/bg_2.png"
         )
+        # ---------------- LEVEL 3 ----------------
+        level3 = Level(
+            platforms=[
+                Platform(100, 650, 250, 20),
+                Platform(400, 580, 200, 20),
+                Platform(650, 500, 180, 20),
+            ],
+            spikes=[
+                Spike(420, 650, 30, 30),
+                Spike(450, 650, 30, 30),
+            ],
+            doors=[
+                Door(650, 430, 50, 70, "exit"),
+            ],
+            player_spawn=(120, 550),
+            bg_path="assets/images/backgrounds/bg_2.png"
+        )
+        # ---------------- LEVEL 4 ----------------
+        level4 = Level(
+            platforms=[
+                Platform(100, 650, 250, 20),
+                Platform(400, 580, 200, 20),
+                Platform(650, 500, 180, 20),
+            ],
+            spikes=[
+                Spike(420, 650, 30, 30),
+                Spike(450, 650, 30, 30),
+            ],
+            doors=[
+                Door(650, 430, 50, 70, "exit"),
+            ],
+            player_spawn=(120, 550),
+            bg_path="assets/images/backgrounds/bg_2.png"
+        )
+        # ---------------- LEVEL 5 ----------------
+        level5 = Level(
+            platforms=[
+                Platform(100, 650, 250, 20),
+                Platform(400, 580, 200, 20),
+                Platform(650, 500, 180, 20),
+            ],
+            spikes=[
+                Spike(420, 650, 30, 30),
+                Spike(450, 650, 30, 30),
+            ],
+            doors=[
+                Door(650, 430, 50, 70, "exit"),
+            ],
+            player_spawn=(120, 550),
+            bg_path="assets/images/backgrounds/bg_2.png"
+        )
         
         self.level_manager.add_level(1, level1)
         self.level_manager.add_level(2, level2)
+        self.level_manager.add_level(3, level3)
+        self.level_manager.add_level(4, level4)
+        self.level_manager.add_level(5, level5)
 
         self.current_level_id = 1
         self.current_level = self.level_manager.load(self.current_level_id)
@@ -176,7 +235,19 @@ class Game:
             elif self.state == self.WIN:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.nextlevel.next_level_btn.collidepoint(event.pos):
-                        self.load_next_level()
+                        if self.hasNextLevel:
+                            self.load_next_level()
+                        else:
+                            # FINAL → RESTART GAME
+                            self.current_level_id = 1
+                            self.current_level = self.level_manager.load(1)
+                            self.player = Player(*self.current_level.player_spawn, 40, 40)
+
+                            self.timeLeft = 30.0
+                            self.totalPings = 0
+                            self.ping.reset()
+
+                            self.start_transition(self.LEVEL)
 
                     if self.nextlevel.back_btn.collidepoint(event.pos):
                         self.start_transition(self.MENU)
@@ -243,6 +314,12 @@ class Game:
         for d in self.current_level.doors:
             if d.doorType == "exit" and self.player.rect.colliderect(d.rect):
                 self.ping.reset()
+                self.win_level = self.current_level_id
+                self.win_time = self.timeLeft
+                self.win_pings = self.totalPings
+
+                next_id = self.current_level_id + 1
+                self.hasNextLevel = self.level_manager.has_level(next_id)
                 self.start_transition(self.WIN)
 
         self.player.rect.x = max(0, min(self.player.rect.x, WIDTH - self.player.rect.width))
@@ -354,9 +431,12 @@ class Game:
                 self.nextlevel.draw_game_over()
 
             elif self.state == self.WIN:
-                self.nextlevel.currentlevel = self.level_manager.current_level
-                self.nextlevel.timeLeft = self.timeLeft
-                self.nextlevel.totalPings = self.totalPings
+                self.nextlevel.currentlevel = self.win_level
+                self.nextlevel.timeLeft = self.win_time
+                self.nextlevel.totalPings = self.win_pings
+                self.nextlevel.hasNextLevel = self.hasNextLevel
+                self.nextlevel.isFinalLevel = not self.hasNextLevel
+
                 self.nextlevel.draw_win()
 
             if self.transitioning:

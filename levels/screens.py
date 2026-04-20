@@ -9,7 +9,8 @@ class Screens:
         self.currentlevel = currentlevel
         self.timeLeft = timeLeft
         self.totalPings = totalPings
-
+        self.hasNextLevel = True
+        self.isFinalLevel = False
 
         self.font_title = pygame.font.SysFont("arial", 60)
         self.font_time = pygame.font.SysFont("arial", 30)
@@ -67,7 +68,12 @@ class Screens:
         self.screen.fill((10, 10, 20))
 
         # LEVEL
-        title = self.font_title.render(f"Level {self.currentlevel} Complete", True, (255, 255, 255))
+        if self.isFinalLevel:
+            title = self.font_title.render("You Escaped the Darkness", True, (255, 255, 255))
+            msg = self.font_time.render("The silence can no longer hold you...", True, (200, 200, 200))
+            self.screen.blit(msg, (WIDTH // 2 - msg.get_width() // 2, HEIGHT // 6 + 70))
+        else:
+            title = self.font_title.render(f"Level {self.currentlevel} Complete", True, (255, 255, 255))
         self.screen.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 6))
 
         time = self.font_time.render(f"Total Time left: {self.timeLeft:0.2f}", True, (255, 255, 255))
@@ -76,15 +82,28 @@ class Screens:
         ping = self.font_ping.render(f"Total Ping  Left: {self.totalPings}", True, (255, 255, 255))
         self.screen.blit(ping, (WIDTH // 2 - ping.get_width() // 2, HEIGHT // 3 + 40))
 
-        # NEXT LEVEL BUTTON
-        if self.next_level_btn.collidepoint(self.mouse_pos):
-            pygame.draw.rect(self.screen, (200, 200, 200), self.next_level_btn)
-            text_color = (0, 0, 0)
-        else:
-            pygame.draw.rect(self.screen, (100, 100, 100), self.next_level_btn)
-            text_color = (255, 255, 255)
+        # ONLY SHOW IF NEXT LEVEL EXISTS
+        if self.hasNextLevel:
+            # NORMAL NEXT BUTTON
+            if self.next_level_btn.collidepoint(self.mouse_pos):
+                pygame.draw.rect(self.screen, (200, 200, 200), self.next_level_btn)
+                text_color = (0, 0, 0)
+            else:
+                pygame.draw.rect(self.screen, (100, 100, 100), self.next_level_btn)
+                text_color = (255, 255, 255)
 
-        next_text = self.font_btn.render("NEXT LEVEL", True, text_color)
+            next_text = self.font_btn.render("NEXT LEVEL", True, text_color)
+        else:
+            # FINAL LEVEL → PLAY AGAIN BUTTON
+            if self.next_level_btn.collidepoint(self.mouse_pos):
+                pygame.draw.rect(self.screen, (200, 200, 200), self.next_level_btn)
+                text_color = (0, 0, 0)
+            else:
+                pygame.draw.rect(self.screen, (100, 100, 100), self.next_level_btn)
+                text_color = (255, 255, 255)
+
+            next_text = self.font_btn.render("PLAY AGAIN", True, text_color)
+
         self.screen.blit(next_text, (
             self.next_level_btn.centerx - next_text.get_width() // 2,
             self.next_level_btn.centery - next_text.get_height() // 2
