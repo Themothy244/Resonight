@@ -56,7 +56,7 @@ class Game:
                 Platform(650, 500, 180, 20),
                 
             ],
-            spikes=[
+            spikes=[    
                 Spike(420, 650, 30, 30),
                 Spike(450, 650, 30, 30),
             ],
@@ -89,17 +89,38 @@ class Game:
         # ---------------- LEVEL 3 ----------------
         level3 = Level(
             platforms=[
-                Platform(100, 650, 250, 20),
-                Platform(400, 580, 200, 20),
-                Platform(650, 500, 180, 20),
+                Platform(180, 540, 180, 20),
+                Platform(580, 540, 165, 20),
+                Platform(420, 400, 150, 20),
             ],
             spikes=[
+                
+                Spike(180, 650, 30, 30),
+                Spike(210, 650, 30, 30),
+                Spike(240, 650, 30, 30),
+                Spike(270, 650, 30, 30),
+                Spike(300, 650, 30, 30),
+                Spike(330, 650, 30, 30),
+                Spike(360, 650, 30, 30),
+                Spike(390, 650, 30, 30),
                 Spike(420, 650, 30, 30),
                 Spike(450, 650, 30, 30),
+                Spike(540, 371, 30, 30),
+                Spike(480, 650, 30, 30),
+                Spike(510, 650, 30, 30),
+                Spike(540, 650, 30, 30),
+                Spike(570, 650, 30, 30),
+                Spike(600, 650, 30, 30),
+                Spike(630, 650, 30, 30),
+                Spike(660, 650, 30, 30),
+                Spike(690, 650, 30, 30),
+                Spike(720, 650, 30, 30),
+                Spike(750, 650, 30, 30),
+                Spike(780, 650, 30, 30),
             ],
             doors=[
                 Door(50, self.ground_y - 80, 60, 80, "entrance"),
-                Door(650, 430, 50, 70, "exit"),
+                Door(850, 608, 50, 70, "exit"),
             ],
             player_spawn=(120, 550),
             bg_path="assets/images/backgrounds/bg_2.png"
@@ -228,7 +249,7 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.nextlevel.start_btn.collidepoint(event.pos):
                         self.current_level_id = 1
-                        self.current_level = self.level_manager.load(1)
+                        self.current_level = self.level_manager.load(3)
                         self.player = Player(*self.current_level.player_spawn, 40, 40)
 
                         self.ping.reset()
