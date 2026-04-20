@@ -76,7 +76,7 @@ class Screens:
             title = self.font_inter_medium.render("You Escaped the Darkness", True, (255, 255, 255))
             msg = self.font_courier.render("The silence can no longer hold you...", True, (200, 200, 200))
             self.screen.blit(msg, (WIDTH // 2 - msg.get_width() // 2, HEIGHT // 6 + 70))
-            self.screen.blit(title, (WIDTH // 2 - title.get_width() // 2, 140))
+            self.screen.blit(title, (WIDTH // 2 - title.get_width() // 2, 110))
         else:
             title = self.font_inter_medium.render(f"Level {self.currentlevel} Complete", True, (255, 255, 255))
             self.screen.blit(title, (WIDTH // 2 - title.get_width() // 2, 160))
