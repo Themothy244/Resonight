@@ -35,7 +35,7 @@ class Game:
         # ================= TRANSITION =================
         self.transitioning = False
         self.transition_alpha = 0
-        self.transition_duration = 0.7  # seconds
+        self.transition_duration = 0.5  # seconds
         self.transition_speed = 255 / (FPS * self.transition_duration)
         self.target_state = None
         self.fade_out = False
