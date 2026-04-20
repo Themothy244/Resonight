@@ -51,6 +51,79 @@ class Game:
         # ---------------- LEVEL 1 ----------------
         level1 = Level(
             platforms=[
+                Platform(100, 650, 250, 20),
+                Platform(400, 580, 200, 20),
+                Platform(650, 500, 180, 20),
+            ],
+            spikes=[
+                Spike(420, 650, 30, 30),
+                Spike(450, 650, 30, 30),
+            ],
+            doors=[
+                Door(50, self.ground_y - 80, 60, 80, "entrance"),
+                Door(650, 430, 50, 70, "exit"),
+            ],
+            player_spawn=(120, 550),
+            bg_path="assets/images/backgrounds/bg_2.png"
+        )
+
+        # ---------------- LEVEL 2 ----------------
+        level2 = Level(
+            platforms=[
+                Platform(100, 650, 250, 20),
+                Platform(400, 580, 200, 20),
+                Platform(650, 500, 180, 20),
+            ],
+            spikes=[
+                Spike(420, 650, 30, 30),
+                Spike(450, 650, 30, 30),
+            ],
+            doors=[
+                Door(50, self.ground_y - 80, 60, 80, "entrance"),
+                Door(650, 430, 50, 70, "exit"),
+            ],
+            player_spawn=(120, 550),
+            bg_path="assets/images/backgrounds/bg_2.png"
+        )
+        # ---------------- LEVEL 3 ----------------
+        level3 = Level(
+            platforms=[
+                Platform(100, 650, 250, 20),
+                Platform(400, 580, 200, 20),
+                Platform(650, 500, 180, 20),
+            ],
+            spikes=[
+                Spike(420, 650, 30, 30),
+                Spike(450, 650, 30, 30),
+            ],
+            doors=[
+                Door(50, self.ground_y - 80, 60, 80, "entrance"),
+                Door(650, 430, 50, 70, "exit"),
+            ],
+            player_spawn=(120, 550),
+            bg_path="assets/images/backgrounds/bg_2.png"
+        )
+        # ---------------- LEVEL 4 ----------------
+        level4 = Level(
+            platforms=[
+                Platform(100, 650, 250, 20),
+                Platform(400, 580, 200, 20),
+                Platform(650, 500, 180, 20),
+            ],
+            spikes=[
+                Spike(420, 650, 30, 30),
+                Spike(450, 650, 30, 30),
+            ],
+            doors=[
+                Door(50, self.ground_y - 80, 60, 80, "entrance"),
+                Door(650, 430, 50, 70, "exit"),
+            ],
+            player_spawn=(120, 550),
+            bg_path="assets/images/backgrounds/bg_2.png"
+        )
+        # ---------------- LEVEL 5 ----------------
+        level5 = Level(
+            platforms=[
                 Platform(160, 240, 800, 20),
                 Platform(0, 480, 800, 20),
                 Platform(830, 590, 130, 20),
@@ -72,75 +145,6 @@ class Game:
                 Door(800, 160, 60, 80, "exit"),
             ],
             player_spawn=(100, self.ground_y - 70),
-            bg_path="assets/images/backgrounds/bg_2.png"
-        )
-
-        # ---------------- LEVEL 2 ----------------
-        level2 = Level(
-            platforms=[
-                Platform(100, 650, 250, 20),
-                Platform(400, 580, 200, 20),
-                Platform(650, 500, 180, 20),
-            ],
-            spikes=[
-                Spike(420, 650, 30, 30),
-                Spike(450, 650, 30, 30),
-            ],
-            doors=[
-                Door(650, 430, 50, 70, "exit"),
-            ],
-            player_spawn=(120, 550),
-            bg_path="assets/images/backgrounds/bg_2.png"
-        )
-        # ---------------- LEVEL 3 ----------------
-        level3 = Level(
-            platforms=[
-                Platform(100, 650, 250, 20),
-                Platform(400, 580, 200, 20),
-                Platform(650, 500, 180, 20),
-            ],
-            spikes=[
-                Spike(420, 650, 30, 30),
-                Spike(450, 650, 30, 30),
-            ],
-            doors=[
-                Door(650, 430, 50, 70, "exit"),
-            ],
-            player_spawn=(120, 550),
-            bg_path="assets/images/backgrounds/bg_2.png"
-        )
-        # ---------------- LEVEL 4 ----------------
-        level4 = Level(
-            platforms=[
-                Platform(100, 650, 250, 20),
-                Platform(400, 580, 200, 20),
-                Platform(650, 500, 180, 20),
-            ],
-            spikes=[
-                Spike(420, 650, 30, 30),
-                Spike(450, 650, 30, 30),
-            ],
-            doors=[
-                Door(650, 430, 50, 70, "exit"),
-            ],
-            player_spawn=(120, 550),
-            bg_path="assets/images/backgrounds/bg_2.png"
-        )
-        # ---------------- LEVEL 5 ----------------
-        level5 = Level(
-            platforms=[
-                Platform(100, 650, 250, 20),
-                Platform(400, 580, 200, 20),
-                Platform(650, 500, 180, 20),
-            ],
-            spikes=[
-                Spike(420, 650, 30, 30),
-                Spike(450, 650, 30, 30),
-            ],
-            doors=[
-                Door(650, 430, 50, 70, "exit"),
-            ],
-            player_spawn=(120, 550),
             bg_path="assets/images/backgrounds/bg_2.png"
         )
         
@@ -289,7 +293,9 @@ class Game:
     # =========================================================
     def update_reveal(self):
         for obj in self.current_level.get_all_objects():
-            if self.ping.active and self.ping.circle_rect_collision(self.ping.origin, self.ping.radius, obj.rect):
+            # if self.ping.active and self.ping.circle_rect_collision(self.ping.origin, self.ping.radius, obj.rect):
+            if True:
+
                 obj.visible_timer = 10
 
             if obj.visible_timer > 0:
@@ -404,7 +410,7 @@ class Game:
         self.screen.fill(BLACK)
         self.current_level.draw(self.screen)
         self.ping.draw(self.screen)
-        self.apply_mask()
+        # self.apply_mask()
         self.player.draw(self.screen)
         self.draw_ui() 
 
