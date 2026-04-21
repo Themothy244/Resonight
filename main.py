@@ -237,8 +237,6 @@ class Game:
             self.current_level_id = 1
             self.start_transition(self.MENU)
 
-    
-
     # =========================================================
     #                      EVENTS
     # =========================================================
@@ -303,7 +301,10 @@ class Game:
                             self.start_transition(self.LEVEL)
 
                     if self.nextlevel.back_btn.collidepoint(event.pos):
-                        self.start_transition(self.MENU)
+                            self.timeLeft = 30.0
+                            self.totalPings = 0
+                            self.deathReason = ""
+                            self.start_transition(self.MENU)
 
             elif self.state == self.LEVEL:
                 if event.type == pygame.KEYDOWN:
