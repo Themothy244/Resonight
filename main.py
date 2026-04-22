@@ -35,6 +35,9 @@ class Game:
         self.win_level = 0
         self.win_time = 0
         self.win_pings = 0
+        self.blink_timer = 0
+        self.blink_interval = 0.3
+        self.tick_playing = False
 
         self.hasNextLevel = True
 
@@ -79,8 +82,8 @@ class Game:
             ],
             spikes=[
                 Spike(240, 650, 30, 30),
-                Spike(530, 650, 30, 30),
-                Spike(560, 650, 30, 30),
+                Spike(700, 650, 30, 30),
+                Spike(730, 650, 30, 30),
                 Spike(700, 450, 30, 30),
             ],
             doors=[
@@ -203,7 +206,8 @@ class Game:
 
         # ================= ASSETS =================
         self.vignette = pygame.image.load("assets/images/effects/Vignette.png").convert_alpha()
-        self.sound = pygame.mixer.Sound("assets/sounds/Finger_snap.mp3")
+        self.finger_snap = pygame.mixer.Sound("assets/sounds/Finger_snap.mp3")
+        self.clock_tick = pygame.mixer.Sound("assets/sounds/clock_tick.mp3")
 
         # ================= MENU =================
         self.mouse_pos = pygame.mouse.get_pos()
@@ -309,7 +313,7 @@ class Game:
             elif self.state == self.LEVEL:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_e:
-                        self.sound.play()
+                        self.finger_snap.play()
                         self.ping.trigger(self.player.rect.center)
 
                         self.totalPings += 1
@@ -345,12 +349,16 @@ class Game:
         for s in self.current_level.spikes:
             if self.player.rect.colliderect(s.rect):
                 self.ping.reset()
+                self.clock_tick.stop()
+                self.tick_playing = False
                 self.deathReason = "spike"
                 self.start_transition(self.GAME_OVER)
         
         for d in self.current_level.doors:
             if d.doorType == "exit" and self.player.rect.colliderect(d.rect):
                 self.ping.reset()
+                self.clock_tick.stop()
+                self.tick_playing = False
                 self.win_level = self.current_level_id
                 self.win_time = self.timeLeft
                 self.win_pings = self.totalPings
@@ -413,7 +421,17 @@ class Game:
         minutes = int(self.timeLeft) // 60
         seconds = int(self.timeLeft) % 60
 
-        timer_text = font_inter.render(f"{minutes:02d}:{seconds:02d}", True, (255, 255, 255))
+        # DEFAULT COLOR
+        color = (255, 255, 255)
+
+        # BLINK WHEN LOW TIME
+        if self.timeLeft <= 10:
+            if int(self.blink_timer / self.blink_interval) % 2 == 0:
+                color = (255, 0, 0)  # RED
+            else:
+                color = (255, 255, 255)  # WHITE
+
+        timer_text = font_inter.render(f"{minutes:02d}:{seconds:02d}", True, color)
         self.screen.blit(timer_text, (WIDTH//2 - timer_text.get_width()//2, 10))
 
         # RIGHT: PINGS
@@ -423,13 +441,29 @@ class Game:
     #                   LEVEL LOGIC & DRAW
     # =========================================================
     def update(self):
+        self.blink_timer += self.clock.get_time() / 1000
         dt = self.clock.get_time() / 1000  # seconds
         # countdown
         self.timeLeft -= dt
+        # START ticking when <= 10 seconds
+        if self.timeLeft <= 10 and not self.tick_playing:
+            self.clock_tick.play(-1)  # 🔁 loop indefinitely
+            self.tick_playing = True
+
+        # STOP ticking if somehow time goes back above 10
+        if self.timeLeft > 10 and self.tick_playing:
+            self.clock_tick.stop()
+            self.tick_playing = False
 
         # if time runs out → GAME OVER
         if self.timeLeft <= 0:
             self.timeLeft = 0
+
+            # 🔴 STOP the ticking sound
+            if self.tick_playing:
+                self.clock_tick.stop()
+                self.tick_playing = False
+
             self.deathReason = "time"
             self.start_transition(self.GAME_OVER)
             return
