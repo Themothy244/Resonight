@@ -9,27 +9,33 @@ from entities.platform import Platform
 from entities.spike import Spike
 from entities.door import Door
 from entities.player import Player
-from systems.ping import PingSystem
+from systems.ping_system import PingSystem
+from systems.mask_system import MaskSystem
+from systems.timer_system import TimerSystem
 from levels.level import Level
 from levels.level_manager import LevelManager
 from levels.screens import Screens
+from levels.hud import HUD
 
 class Game:
     def __init__(self):
+        # ================= CORE =================
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Resonight")
         self.clock = pygame.time.Clock()
         self.running = True
 
-        self.dark_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-        self.ground_y = HEIGHT - 40
-
+        # ================= STATE =================
         self.MENU = "menu"
         self.LEVEL = "level"
         self.GAME_OVER = "game_over"
-        self.state = self.MENU
         self.WIN = "win"
-        self.timeLeft = 30.0
+        self.state = self.MENU
+
+        # ================= WORLD =================
+        self.ground_y = HEIGHT - 40
+
+        # ================= GAME DATA / STATS =================
         self.totalPings = 0
         self.deathReason = ""
         self.win_level = 0
@@ -38,13 +44,15 @@ class Game:
         self.lives = 3
         self.win_lives = 0
 
+        # ================= INPUT & FLAGS =================
         self.hasNextLevel = True
 
-        # ================= TRANSITION =================
+        # ================= TRANSITIONS & EFFECTS =================
         self.transitioning = False
         self.transition_alpha = 0
         self.transition_duration = 0.5  # seconds
         self.transition_speed = 255 / (FPS * self.transition_duration)
+        self.fade_speed = 255 / 18
         self.target_state = None
         self.fade_out = False
 
@@ -81,8 +89,8 @@ class Game:
             ],
             spikes=[
                 Spike(240, 650, 30, 30),
-                Spike(530, 650, 30, 30),
-                Spike(560, 650, 30, 30),
+                Spike(700, 650, 30, 30),
+                Spike(730, 650, 30, 30),
                 Spike(700, 450, 30, 30),
             ],
             doors=[
@@ -190,27 +198,31 @@ class Game:
 
         self.current_level_id = 1
         self.current_level = self.level_manager.load(self.current_level_id)
-
-        # ================= PLAYER =================
-        self.player = Player(*self.current_level.player_spawn, 40, 40)
-
-        # ================= PING =================
-        self.ping = PingSystem((WIDTH, HEIGHT))
-
-        # ================= MASK =================
-        self.fade_speed = 255 / 18
-        self.mask_closing = False
-        self.mask_timer = 0
-        self.MASK_DELAY = 30
-
+        
         # ================= ASSETS =================
         self.vignette = pygame.image.load("assets/images/effects/Vignette.png").convert_alpha()
-        self.sound = pygame.mixer.Sound("assets/sounds/Finger_snap.mp3")
+        self.finger_snap = pygame.mixer.Sound("assets/sounds/Finger_snap.mp3")
+        self.clock_tick = pygame.mixer.Sound("assets/sounds/clock_tick.mp3")
 
-        # ================= MENU =================
-        self.mouse_pos = pygame.mouse.get_pos()
+        # ================= GAME SYSTEMS =================
+        self.hud = HUD()
+        self.player = Player(*self.current_level.player_spawn, 40, 40)
+        self.ping = PingSystem((WIDTH, HEIGHT))
+        self.mask = MaskSystem((WIDTH, HEIGHT), self.vignette)
+        self.timer = TimerSystem(30.0, self.clock_tick)
+        self.nextlevel = Screens(self.screen, self.level_manager.current_level, self.timer.time_left, self.totalPings)
+
 
         self.nextlevel = Screens(self.screen, self.mouse_pos, self.level_manager.current_level, self.timeLeft, self.totalPings, self.lives)
+
+    # =========================================================
+    #                     STATE CONTROL
+    # =========================================================
+    def reset_player(self):
+        self.player = Player(*self.current_level.player_spawn, 40, 40)
+        self.timer.reset()
+        self.totalPings = 0
+        self.ping.reset()
 
     def start_transition(self, new_state):
         if not self.transitioning:
@@ -219,21 +231,14 @@ class Game:
             self.transition_alpha = 0
             self.fade_out = True
 
-    # =========================================================
-    #                   LOAD TO NEXT LEVEL
-    # =========================================================
     def load_next_level(self):
         next_id = self.current_level_id + 1
-        self.timeLeft = 30.0
-        self.totalPings = 0
+        self.reset_player()
 
         if self.level_manager.has_level(next_id):
             self.current_level_id = next_id
 
             self.current_level = self.level_manager.load(next_id)
-            self.player = Player(*self.current_level.player_spawn, 40, 40)
-
-            self.ping.reset()
             self.start_transition(self.LEVEL)
         else:
             self.current_level_id = 1
@@ -245,10 +250,11 @@ class Game:
     def handle_events(self):
         if self.transitioning:
             return
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-
+            # ================= MENU / START =================
             if self.state == self.MENU:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
@@ -260,14 +266,13 @@ class Game:
                     if self.nextlevel.start_btn.collidepoint(event.pos):
                         self.current_level_id = 1
                         self.current_level = self.level_manager.load(1)
-                        self.player = Player(*self.current_level.player_spawn, 40, 40)
-
                         self.ping.reset()
                         self.start_transition(self.LEVEL)
 
                     if self.nextlevel.quit_btn.collidepoint(event.pos):
                         self.running = False
 
+            # ================= WIN =================
             elif self.state == self.WIN:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.nextlevel.next_level_btn.collidepoint(event.pos):
@@ -277,51 +282,34 @@ class Game:
                             # FINAL → RESTART GAME
                             self.current_level_id = 1
                             self.current_level = self.level_manager.load(1)
-                            self.player = Player(*self.current_level.player_spawn, 40, 40)
-
-                            self.timeLeft = 30.0
-                            self.totalPings = 0
-                            self.ping.reset()
+                            self.reset_player()
 
                             self.start_transition(self.LEVEL)
 
                     if self.nextlevel.back_btn.collidepoint(event.pos):
                         self.start_transition(self.MENU)
 
+            # ================= GAME OVER =================
             elif self.state == self.GAME_OVER:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.nextlevel.again_btn.collidepoint(event.pos):
                             self.current_level = self.level_manager.load(self.level_manager.current_level)
-                            self.player = Player(*self.current_level.player_spawn, 40, 40)
-
-                            self.timeLeft = 30.0
-                            self.totalPings = 0
-                            self.deathReason = ""
-
-                            self.ping.reset()
-
+                            self.reset_player()
                             self.start_transition(self.LEVEL)
 
                     if self.nextlevel.back_btn.collidepoint(event.pos):
-                            self.timeLeft = 30.0
-                            self.totalPings = 0
-                            self.deathReason = ""
+                            self.reset_player()
                             self.start_transition(self.MENU)
 
+            # ================= LEVEL ================= 
             elif self.state == self.LEVEL:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_e:
-                        self.sound.play()
+                        self.finger_snap.play()
                         self.ping.trigger(self.player.rect.center)
-
                         self.totalPings += 1
-
-                        self.timeLeft -= 3
-                        if self.timeLeft < 0:
-                            self.timeLeft = 0
-
-                        self.mask_closing = False
-                        self.mask_timer = 0
+                        self.timer.penalize(3)
+                        self.mask.trigger_open()
 
     # =========================================================
     #                  REVEAL SYSTEM
@@ -348,6 +336,7 @@ class Game:
             if self.player.rect.colliderect(s.rect):
                 self.lives -= 1
                 self.ping.reset()
+                self.timer.stop_tick()
                 self.deathReason = "spike"
                 self.start_transition(self.GAME_OVER)
             
@@ -363,8 +352,9 @@ class Game:
         for d in self.current_level.doors:
             if d.doorType == "exit" and self.player.rect.colliderect(d.rect):
                 self.ping.reset()
+                self.timer.stop_tick()
                 self.win_level = self.current_level_id
-                self.win_time = self.timeLeft
+                self.win_time = self.timer.time_left
                 self.win_pings = self.totalPings
                 self.win_lives = self.lives
 
@@ -375,32 +365,8 @@ class Game:
         self.player.rect.x = max(0, min(self.player.rect.x, WIDTH - self.player.rect.width))
 
     # =========================================================
-    #                    MASK SYSTEM
+    #                STATE TRANSITION EFFECTS
     # =========================================================
-    def apply_mask(self):
-        if self.ping.radius <= 0:
-            self.screen.fill(BLACK)
-            return
-
-        self.dark_surface.fill((0, 0, 0, 255))
-
-        size = int(self.ping.radius * 2.3)
-        vignette = pygame.transform.smoothscale(self.vignette, (size, size))
-        rect = vignette.get_rect(center=self.ping.origin)
-
-        self.dark_surface.blit(vignette, rect, special_flags=pygame.BLEND_RGBA_MULT)
-        self.screen.blit(self.dark_surface, (0, 0))
-
-    def update_mask(self):
-        if not self.ping.active:
-            self.mask_closing = True
-
-        if self.mask_closing:
-            self.mask_timer += 1
-            if self.mask_timer >= self.MASK_DELAY:
-                self.mask_closing = False
-                self.ping.radius = 0
-
     def update_transition(self):
         if self.transitioning:
             if self.fade_out:
@@ -435,18 +401,18 @@ class Game:
         # RIGHT: PINGS
         ping_text = font_arial.render(f"Pings: {self.totalPings}", True, (255, 255, 255))
         self.screen.blit(ping_text, (WIDTH - ping_text.get_width() - 10, 10))
+
     # =========================================================
     #                   LEVEL LOGIC & DRAW
     # =========================================================
     def update(self):
-        dt = self.clock.get_time() / 1000  # seconds
-        # countdown
-        self.timeLeft -= dt
+        dt = self.clock.get_time() / 1000
 
         # if time runs out → GAME OVER
         if self.timeLeft <= 0:
             self.timeLeft = 0
             self.lives -= 1
+        if self.timer.update(dt):
             self.deathReason = "time"
             
 
@@ -465,15 +431,15 @@ class Game:
         self.ping.update()
         self.check_collisions()
         self.update_reveal()
-        self.update_mask()
+        self.mask.update(self.ping)
     
     def draw(self):
         self.screen.fill(BLACK)
         self.current_level.draw(self.screen)
         self.ping.draw(self.screen)
-        self.apply_mask()
+        self.mask.draw(self.screen, self.ping)
         self.player.draw(self.screen)
-        self.draw_ui() 
+        self.hud.draw(self.screen, self.current_level_id, self.timer.time_left, self.totalPings)
 
     # =========================================================
     #                      MAIN LOOP
@@ -483,9 +449,10 @@ class Game:
             self.clock.tick(FPS)
             self.handle_events()
             self.update_transition()
+            mouse_pos = pygame.mouse.get_pos()
 
             if self.state == self.MENU:
-                self.nextlevel.draw_menu()
+                self.nextlevel.draw_menu(mouse_pos)
 
             elif self.state == self.LEVEL:
                 if not self.transitioning:
@@ -495,7 +462,7 @@ class Game:
             elif self.state == self.GAME_OVER:
                 self.screen.fill((20, 0, 0))
                 self.nextlevel.currentlevel = self.deathReason
-                self.nextlevel.draw_game_over()
+                self.nextlevel.draw_game_over(mouse_pos)
 
             elif self.state == self.WIN:
                 self.nextlevel.currentlevel = self.win_level
@@ -505,7 +472,7 @@ class Game:
                 self.nextlevel.hasNextLevel = self.hasNextLevel
                 self.nextlevel.isFinalLevel = not self.hasNextLevel
 
-                self.nextlevel.draw_win()
+                self.nextlevel.draw_win(mouse_pos)
 
             if self.transitioning:
                 transition_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
