@@ -35,6 +35,8 @@ class Game:
         self.win_level = 0
         self.win_time = 0
         self.win_pings = 0
+        self.lives = 3
+        self.win_lives = 0
 
         self.hasNextLevel = True
 
@@ -208,7 +210,7 @@ class Game:
         # ================= MENU =================
         self.mouse_pos = pygame.mouse.get_pos()
 
-        self.nextlevel = Screens(self.screen, self.mouse_pos, self.level_manager.current_level, self.timeLeft, self.totalPings)
+        self.nextlevel = Screens(self.screen, self.mouse_pos, self.level_manager.current_level, self.timeLeft, self.totalPings, self.lives)
 
     def start_transition(self, new_state):
         if not self.transitioning:
@@ -344,9 +346,19 @@ class Game:
         
         for s in self.current_level.spikes:
             if self.player.rect.colliderect(s.rect):
+                self.lives -= 1
                 self.ping.reset()
                 self.deathReason = "spike"
                 self.start_transition(self.GAME_OVER)
+            
+                if self.lives <= 0:
+                    self.lives = 3
+                    self.current_level = self.level_manager.load(1)
+                    self.current_level_id = 1
+                    self.deathReason = "lives"
+                    self.start_transition(self.GAME_OVER)
+                    self.player = Player(*self.current_level.player_spawn, 40, 40)
+
         
         for d in self.current_level.doors:
             if d.doorType == "exit" and self.player.rect.colliderect(d.rect):
@@ -354,6 +366,7 @@ class Game:
                 self.win_level = self.current_level_id
                 self.win_time = self.timeLeft
                 self.win_pings = self.totalPings
+                self.win_lives = self.lives
 
                 next_id = self.current_level_id + 1
                 self.hasNextLevel = self.level_manager.has_level(next_id)
@@ -409,6 +422,9 @@ class Game:
         level_text = font_arial.render(f"Level: {self.current_level_id}", True, (255, 255, 255))
         self.screen.blit(level_text, (10, 10))
 
+        lives_text = font_arial.render(f"Lives: {self.lives}", True, (255, 255, 255))
+        self.screen.blit(lives_text, (WIDTH - lives_text.get_width() - 5, 70))
+
         # CENTER: TIMER (0.00 format)
         minutes = int(self.timeLeft) // 60
         seconds = int(self.timeLeft) % 60
@@ -430,9 +446,19 @@ class Game:
         # if time runs out → GAME OVER
         if self.timeLeft <= 0:
             self.timeLeft = 0
+            self.lives -= 1
             self.deathReason = "time"
+            
+
+            if self.lives <= 0:
+                self.lives = 3
+                self.current_level = self.level_manager.load(1)
+                self.current_level_id = 1
+                self.deathReason = "lives"
+                self.player = Player(*self.current_level.player_spawn, 40, 40)
+
             self.start_transition(self.GAME_OVER)
-            return
+
         
         keys = pygame.key.get_pressed()
         self.player.update(keys, self.current_level.platforms, self.ground_y)
@@ -475,6 +501,7 @@ class Game:
                 self.nextlevel.currentlevel = self.win_level
                 self.nextlevel.timeLeft = self.win_time
                 self.nextlevel.totalPings = self.win_pings
+                self.nextlevel.lives = self.win_lives
                 self.nextlevel.hasNextLevel = self.hasNextLevel
                 self.nextlevel.isFinalLevel = not self.hasNextLevel
 
