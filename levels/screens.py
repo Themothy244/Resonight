@@ -3,19 +3,25 @@ from settings import *
 
 
 class Screens:
+<<<<<<< Updated upstream
     def __init__(self, screen, currentlevel, timeLeft, totalPings):
+=======
+    def __init__(self, screen, mouse_pos, currentlevel, timeLeft, totalPings, lives,):
+>>>>>>> Stashed changes
         self.screen = screen
         self.currentlevel = currentlevel
         self.timeLeft = timeLeft
         self.totalPings = totalPings
         self.hasNextLevel = True
         self.isFinalLevel = False
+        self.lives = lives
 
         self.font_inter = pygame.font.SysFont("Inter", 84, bold=True)
         self.font_inter_medium = pygame.font.SysFont("Inter", 60, bold=True)
         self.font_courier = pygame.font.SysFont("courier", 32)
         self.font_time = pygame.font.SysFont("arial", 30)
         self.font_ping = pygame.font.SysFont("arial", 30)
+        self.font_lives = pygame.font.SysFont("arial", 30)
         self.font_btn = pygame.font.SysFont("arial", 35)
 
         self.start_btn = pygame.Rect(WIDTH//2 - 150, 360, 300, 60)
@@ -74,14 +80,28 @@ class Screens:
             title = self.font_inter_medium.render("You Escaped the Darkness", True, (255, 255, 255))
         else:
             title = self.font_inter_medium.render(f"Level {self.currentlevel} Complete", True, (255, 255, 255))
+<<<<<<< Updated upstream
+=======
+            self.screen.blit(title, (WIDTH // 2 - title.get_width() // 2, 140))
+>>>>>>> Stashed changes
 
         self.screen.blit(title, (WIDTH // 2 - title.get_width() // 2, 120))
 
         time = self.font_courier.render(f"Time left: {self.timeLeft:0.2f}", True, (255, 255, 255))
+<<<<<<< Updated upstream
         ping = self.font_courier.render(f"Total Ping: {self.totalPings}", True, (255, 255, 255))
 
         self.screen.blit(time, (WIDTH // 2 - time.get_width() // 2, 250))
         self.screen.blit(ping, (WIDTH // 2 - ping.get_width() // 2, 290))
+=======
+        self.screen.blit(time, (WIDTH // 2 - time.get_width() // 2, 190))
+
+        ping = self.font_courier.render(f"Total Ping: {self.totalPings}", True, (255, 255, 255))
+        self.screen.blit(ping, (WIDTH // 2 - ping.get_width() // 2, 230))
+
+        lives = self.font_courier.render(f"Total Lives Remain: {self.lives}", True, (255, 255, 255))
+        self.screen.blit(lives, (WIDTH // 2 - lives.get_width() // 2, 280))
+>>>>>>> Stashed changes
 
         hover = self.next_level_btn.collidepoint(mouse_pos)
 
@@ -122,10 +142,18 @@ class Screens:
     def draw_game_over(self, mouse_pos):
         self.screen.fill((0, 0, 0))
 
+<<<<<<< Updated upstream
         if self.currentlevel == "time":
             message = "Your light faded into silence..."
+=======
+        # LEVEL
+        if self.currentlevel == "lives":
+            message = "game over"
+>>>>>>> Stashed changes
         elif self.currentlevel == "spike":
             message = "The darkness bit back."
+        elif self.currentlevel == "time":
+            message = "Your light faded into silence..."
         else:
             message = "You Lose"
 
