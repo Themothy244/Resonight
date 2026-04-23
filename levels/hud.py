@@ -12,10 +12,13 @@ class HUD:
     def update(self, dt):
         self.blink_timer += dt
 
-    def draw(self, screen, level, timeLeft, totalPings):
+    def draw(self, screen, level, timeLeft, totalPings, lives):
         # LEFT: LEVEL
         level_text = self.font_text.render(f"Level: {level}", True, (255, 255, 255))
         screen.blit(level_text, (10, 10))
+
+        lives_text = self.font_text.render(f"Level: {lives}", True, (255, 255, 255))
+        screen.blit(lives_text, (WIDTH - lives_text.get_width() - 10, 40))
 
         # TIMER
         minutes = int(timeLeft) // 60
