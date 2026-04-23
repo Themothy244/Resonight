@@ -210,10 +210,10 @@ class Game:
         self.ping = PingSystem((WIDTH, HEIGHT))
         self.mask = MaskSystem((WIDTH, HEIGHT), self.vignette)
         self.timer = TimerSystem(30.0, self.clock_tick)
-        self.nextlevel = Screens(self.screen, self.level_manager.current_level, self.timer.time_left, self.totalPings)
+        # self.nextlevel = Screens(self.screen, self.level_manager.current_level, self.timer.time_left, self.totalPings)
 
 
-        self.nextlevel = Screens(self.screen, self.mouse_pos, self.level_manager.current_level, self.timeLeft, self.totalPings, self.lives)
+        self.nextlevel = Screens(self.screen, self.level_manager.current_level, self.timer.time_left, self.totalPings, self.lives)
 
     # =========================================================
     #                     STATE CONTROL
