@@ -3,13 +3,14 @@ from settings import *
 
 
 class Screens:
-    def __init__(self, screen, currentlevel, timeLeft, totalPings):
+    def __init__(self, screen, currentlevel, timeLeft, totalPings, lives):
         self.screen = screen
         self.currentlevel = currentlevel
         self.timeLeft = timeLeft
         self.totalPings = totalPings
         self.hasNextLevel = True
         self.isFinalLevel = False
+        self.lives = lives
 
         self.font_inter = pygame.font.SysFont("Inter", 84, bold=True)
         self.font_inter_medium = pygame.font.SysFont("Inter", 60, bold=True)
@@ -79,9 +80,12 @@ class Screens:
 
         time = self.font_courier.render(f"Time left: {self.timeLeft:0.2f}", True, (255, 255, 255))
         ping = self.font_courier.render(f"Total Ping: {self.totalPings}", True, (255, 255, 255))
+        lives = self.font_courier.render(f"Total Lives Remain: {self.lives}", True, (255, 255, 255))
 
-        self.screen.blit(time, (WIDTH // 2 - time.get_width() // 2, 250))
-        self.screen.blit(ping, (WIDTH // 2 - ping.get_width() // 2, 290))
+
+        self.screen.blit(time, (WIDTH // 2 - time.get_width() // 2, 170))
+        self.screen.blit(ping, (WIDTH // 2 - ping.get_width() // 2, 230))
+        self.screen.blit(lives, (WIDTH // 2 - ping.get_width() // 2, 280))
 
         hover = self.next_level_btn.collidepoint(mouse_pos)
 
@@ -126,6 +130,8 @@ class Screens:
             message = "Your light faded into silence..."
         elif self.currentlevel == "spike":
             message = "The darkness bit back."
+        elif self.currentlevel == "lives":
+            message = "Game Over"
         else:
             message = "You Lose"
 
