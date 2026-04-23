@@ -31,6 +31,7 @@ class Game:
         self.GAME_OVER = "game_over"
         self.WIN = "win"
         self.state = self.MENU
+        self.lives = 3
 
         # ================= WORLD =================
         self.ground_y = HEIGHT - 40
@@ -41,6 +42,7 @@ class Game:
         self.win_level = 0
         self.win_time = 0
         self.win_pings = 0
+        self.win_lives = 0
 
         # ================= INPUT & FLAGS =================
         self.hasNextLevel = True
@@ -208,7 +210,7 @@ class Game:
         self.ping = PingSystem((WIDTH, HEIGHT))
         self.mask = MaskSystem((WIDTH, HEIGHT), self.vignette)
         self.timer = TimerSystem(30.0, self.clock_tick)
-        self.nextlevel = Screens(self.screen, self.level_manager.current_level, self.timer.time_left, self.totalPings)
+        self.nextlevel = Screens(self.screen, self.level_manager.current_level, self.timer.time_left, self.totalPings, self.lives)
 
     # =========================================================
     #                     STATE CONTROL
@@ -330,9 +332,17 @@ class Game:
         for s in self.current_level.spikes:
             if self.player.rect.colliderect(s.rect):
                 self.ping.reset()
+                self.lives -= 1
                 self.timer.stop_tick()
                 self.deathReason = "spike"
                 self.start_transition(self.GAME_OVER)
+
+                if self.lives <= 0:
+                    self.lives = 3
+                    self.current_level_id = 1
+                    self.current_level = self.level_manager.load(1)
+                    self.deathReason = "lives"
+                    self.player = Player(*self.current_level.player_spawn, 40, 40)
         
         for d in self.current_level.doors:
             if d.doorType == "exit" and self.player.rect.colliderect(d.rect):
@@ -341,6 +351,7 @@ class Game:
                 self.win_level = self.current_level_id
                 self.win_time = self.timer.time_left
                 self.win_pings = self.totalPings
+                self.win_lives = self.lives
 
                 next_id = self.current_level_id + 1
                 self.hasNextLevel = self.level_manager.has_level(next_id)
@@ -371,9 +382,18 @@ class Game:
         dt = self.clock.get_time() / 1000
 
         if self.timer.update(dt):
+            self.lives -= 1
             self.deathReason = "time"
+            
+
+            if self.lives <= 0:
+                self.lives = 3
+                self.current_level_id = 1
+                self.current_level = self.level_manager.load(1)
+                self.deathReason = "lives"
+                self.player = Player(*self.current_level.player_spawn, 40, 40)
+
             self.start_transition(self.GAME_OVER)
-            return
         
         keys = pygame.key.get_pressed()
         self.player.update(keys, self.current_level.platforms, self.ground_y)
@@ -388,7 +408,7 @@ class Game:
         self.ping.draw(self.screen)
         self.mask.draw(self.screen, self.ping)
         self.player.draw(self.screen)
-        self.hud.draw(self.screen, self.current_level_id, self.timer.time_left, self.totalPings)
+        self.hud.draw(self.screen, self.current_level_id, self.timer.time_left, self.totalPings, self.lives)
 
     # =========================================================
     #                      MAIN LOOP
@@ -417,6 +437,7 @@ class Game:
                 self.nextlevel.currentlevel = self.win_level
                 self.nextlevel.timeLeft = self.win_time
                 self.nextlevel.totalPings = self.win_pings
+                self.nextlevel.lives = self.win_lives
                 self.nextlevel.hasNextLevel = self.hasNextLevel
                 self.nextlevel.isFinalLevel = not self.hasNextLevel
 
