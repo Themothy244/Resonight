@@ -343,6 +343,7 @@ class Game:
                     self.current_level = self.level_manager.load(1)
                     self.deathReason = "lives"
                     self.player = Player(*self.current_level.player_spawn, 40, 40)
+                break
         
         for d in self.current_level.doors:
             if d.doorType == "exit" and self.player.rect.colliderect(d.rect):
