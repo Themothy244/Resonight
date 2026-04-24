@@ -8,6 +8,12 @@ class HUD:
 
         self.blink_timer = 0
         self.blink_interval = 0.3
+        self.heart = pygame.image.load("assets/images/entities/health_icon.png").convert_alpha()
+        self.empty = pygame.image.load("assets/images/entities/health_icon_blank.png").convert_alpha()
+        
+        width, height = 50, 50
+        self.heart = pygame.transform.scale(self.heart, (width, height))
+        self.empty = pygame.transform.scale(self.empty, (width, height))
 
     def update(self, dt):
         self.blink_timer += dt
@@ -16,9 +22,6 @@ class HUD:
         # LEFT: LEVEL
         level_text = self.font_text.render(f"Level: {level}", True, (255, 255, 255))
         screen.blit(level_text, (10, 10))
-
-        lives_text = self.font_text.render(f"Level: {lives}", True, (255, 255, 255))
-        screen.blit(lives_text, (WIDTH - lives_text.get_width() - 10, 40))
 
         # TIMER
         minutes = int(timeLeft) // 60
@@ -36,3 +39,12 @@ class HUD:
         # RIGHT: PINGS
         ping_text = self.font_text.render(f"Pings: {totalPings}", True, (255, 255, 255))
         screen.blit(ping_text, (WIDTH - ping_text.get_width() - 10, 10))
+
+        # LIVES 
+        for i in range(3):
+            if i < lives:
+                heart = self.heart
+            else:
+                heart = self.empty
+
+            screen.blit(heart, (750 + i * 60, 620))
