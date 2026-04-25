@@ -189,6 +189,37 @@ class Game:
             player_spawn=(100, self.ground_y - 70),
             bg_path="assets/images/backgrounds/bg_2.png"
         )
+        # ---------------- LEVEL 6 ----------------
+        level6 = Level(
+            platforms=[
+            # Moves UP ↔ DOWN
+                Platform(165, 640, 150, 20),
+            # Moves LEFT ↔ RIGHT
+                Platform(380, 520, 180, 20),
+            #normal
+                Platform(599, 380, 400, 20),
+            ],
+            spikes=[
+                
+            #normal
+                Spike(320, 670, 30, 30),
+                Spike(350, 670, 30, 30),
+            # Move RIGHT ← LEFT
+                Spike(550, 540, 30, 30),
+                Spike(580, 540, 30, 30),
+                Spike(610, 540, 30, 30),
+            #Move RIGHT ← LEFT
+                Spike(800, 350, 30, 30),
+                Spike(830, 350, 30, 30),
+                Spike(860, 350, 30, 30),
+            ],
+            doors=[
+                Door(50, self.ground_y - 80, 60, 80, "entrance"),
+                Door(888, 305, 60, 80, "exit"),
+            ],
+            player_spawn=(120, 550),
+            bg_path="assets/images/backgrounds/bg_2.png"
+        )
         # ---------------- LEVEL 7 ----------------
         level7 = Level(
             platforms=[
@@ -251,6 +282,7 @@ class Game:
         self.level_manager.add_level(3, level3)
         self.level_manager.add_level(4, level4)
         self.level_manager.add_level(5, level5)
+        self.level_manager.add_level(6, level6)
         self.level_manager.add_level(7, level7)
 
         self.current_level_id = 1
