@@ -223,57 +223,178 @@ class Game:
         # ---------------- LEVEL 7 ----------------
         level7 = Level(
             platforms=[
-                Platform(0, 520, 250, 20),
-                Platform(350, 520, 200, 20),
-                Platform(650, 520, 150, 20),
+                Platform(0, 530, 250, 20),
+                Platform(350, 550, 200, 20),
+                Platform(650, 550, 150, 20),
 
-                Platform(100, 420, 120, 20),
-                Platform(300, 380, 120, 20),
-                Platform(500, 340, 120, 20),
+                Platform(100, 440, 140, 20),
+                Platform(300, 400, 140, 20),
+                Platform(500, 360, 140, 20),
 
                 # CUT-CUT TOP PATH
-                Platform(50, 260, 80, 20),
-                Platform(180, 230, 70, 20),
-                Platform(300, 200, 70, 20),
-                Platform(420, 170, 70, 20),
+                Platform(50, 300, 90, 20),
+                Platform(180, 270, 90, 20),
+                Platform(300, 240, 90, 20),
+                
 
                 #Final tiny platform near exit
-                Platform(20, 120, 60, 20),
+                Platform(420, 210, 130, 20),
+                Platform(20, 140, 110, 20),
             ],
 
             spikes=[
-                #Ground punish
-                Spike(250, self.ground_y - 30, 30, 30),
-                Spike(280, self.ground_y - 30, 30, 30),
-                Spike(310, self.ground_y - 30, 30, 30),
-
-                #Under platform spikes
-                Spike(120, 440, 30, 30),
-                Spike(320, 400, 30, 30),
-                Spike(520, 360, 30, 30),
-
                 #Above platform spikes
-                Spike(100, 390, 30, 30),
-                Spike(300, 350, 30, 30),
-                Spike(500, 310, 30, 30),
+                Spike(130, 410, 30, 30),
+                Spike(330, 370, 30, 30),
+                Spike(530, 330, 30, 30),
 
                 #Cut path spikes
-                Spike(200, 200, 30, 30),
-                Spike(230, 200, 30, 30),
+                Spike(210, 240, 30, 30),
+                Spike(240, 210, 30, 30),
 
                 Spike(340, 170, 30, 30),
                 Spike(370, 170, 30, 30),
 
-                Spike(60, 90, 30, 30),
-                Spike(90, 90, 30, 30),
+                
             ],
 
             doors=[
-                Door(10, 40, 60, 80, "exit"), #TOP LEFT DOOR CORNER
+                Door(20, 60, 60, 80, "exit"), #TOP LEFT DOOR CORNER
                 Door(20, self.ground_y - 80, 60, 80, "entrance")
             ],
 
             player_spawn=(30, self.ground_y - 70),
+            bg_path="assets/images/backgrounds/bg_2.png"
+        )
+
+        # ---------------- LEVEL 8 ----------------
+        level8 = Level(
+            platforms=[
+                Platform(400, 560, 130, 20),
+                Platform(260, 430, 240, 20),
+                Platform(470, 330, 160, 20),
+                Platform(560, 500, 190, 20),
+                Platform(640, 240, 150, 20),
+                Platform(820, 160, 200, 20),
+            ],
+            spikes=[ 
+                # Around platform 3
+                Spike(600, 300, 30, 30),
+                Spike(570, 300, 30, 30),
+                Spike(540, 300, 30, 30),
+                
+                # Large platform spikes
+                Spike(720, 470, 30, 30),
+                Spike(690, 470, 30, 30),
+                Spike(660, 470, 30, 30),
+                Spike(630, 470, 30, 30),
+                
+                
+                # Upper area spikes
+                Spike(700, 210, 30, 30),
+                Spike(730, 210, 30, 30),
+                Spike(760, 210, 30, 30),
+                
+            
+            ],
+            doors=[
+                Door(50, self.ground_y - 80, 60, 80, "entrance"),
+                Door(860, 80, 60, 80, "exit"),
+            ],
+            player_spawn=(120, self.ground_y - 70),
+            bg_path="assets/images/backgrounds/bg_2.png"
+        )
+
+        # ---------------- LEVEL 9 ----------------
+        level9 = Level(
+            platforms=[
+                Platform(200, 550, 150, 20),
+                Platform(400, 450, 150, 20),
+                Platform(100, 350, 150, 20),
+                Platform(860, 350, 150, 20),
+                Platform(400, 250, 250, 20),
+            ],
+            spikes=[
+                Spike(210, 650, 30, 30),
+                Spike(240, 650, 30, 30),
+                Spike(270, 650, 30, 30),
+                Spike(300, 650, 30, 30),
+                Spike(330, 650, 30, 30),
+                Spike(360, 650, 30, 30),
+                Spike(390, 650, 30, 30),
+                Spike(420, 650, 30, 30),
+                Spike(450, 650, 30, 30),
+                Spike(480, 650, 30, 30),
+                Spike(510, 650, 30, 30),
+                Spike(540, 650, 30, 30),
+                Spike(570, 650, 30, 30),
+                Spike(600, 650, 30, 30),
+                Spike(630, 650, 30, 30),
+                Spike(660, 650, 30, 30),
+                Spike(690, 650, 30, 30),
+                Spike(720, 650, 30, 30),
+                Spike(750, 650, 30, 30),
+                Spike(780, 650, 30, 30),
+                Spike(810, 650, 30, 30),
+                Spike(840, 650, 30, 30),
+                Spike(870, 650, 30, 30),
+                Spike(900, 650, 30, 30),
+                Spike(930, 650, 30, 30),
+
+                #Single spike at the middle
+                Spike(460, 420, 30, 30),
+
+                #Double spike at the edge part 
+                Spike(100, 320, 30, 30),
+                Spike(130, 320, 30, 30),
+
+                #Three spikes near the exit door
+                Spike(470, 220, 30, 30),
+                Spike(500, 220, 30, 30),
+                Spike(530, 220, 30, 30),
+                Spike(560, 220, 30, 30),
+            ],
+            doors=[
+                Door(50, self.ground_y - 80, 60, 80, "entrance"),
+                Door(860, 270, 60, 80, "exit"),
+            ],
+            player_spawn=(120, self.ground_y - 70),
+            bg_path="assets/images/backgrounds/bg_2.png"
+        )
+
+         # ---------------- LEVEL 10 ----------------
+        level10 = Level(
+            platforms=
+            [
+                Platform(400, 550, 400, 20),
+                Platform(520, 458, 150, 15),
+                Platform(250, 450, 150, 15),
+                Platform(400, 320, 150, 15),
+                Platform(700, 380, 150, 15),
+                Platform(600, 130, 250, 15),
+                Platform(250, 230, 180, 15),
+            ],
+            spikes=[
+                Spike(770, 520, 30, 30),
+                Spike(740, 520, 30, 30),
+                Spike(710, 520, 30, 30),
+                Spike(680, 520, 30, 30),
+
+                Spike(820, 350, 30, 30),
+                Spike(790, 350, 30, 30),
+                Spike(760, 350, 30, 30),
+
+                Spike(400, 290, 30, 30),
+                Spike(430, 290, 30, 30),
+                Spike(460, 290, 30, 30),
+
+                Spike(710, 100, 30, 30),
+            ],
+             doors=[
+                Door(50, self.ground_y - 80, 60, 80, "entrance"),
+                Door(790, 50, 60, 80, "exit"),
+            ],
+            player_spawn=(120, self.ground_y - 70),
             bg_path="assets/images/backgrounds/bg_2.png"
         )
         
@@ -284,6 +405,9 @@ class Game:
         self.level_manager.add_level(5, level5)
         self.level_manager.add_level(6, level6)
         self.level_manager.add_level(7, level7)
+        self.level_manager.add_level(8, level8)
+        self.level_manager.add_level(9, level9)
+        self.level_manager.add_level(10, level10)
 
         self.current_level_id = 1
         self.current_level = self.level_manager.load(self.current_level_id)
