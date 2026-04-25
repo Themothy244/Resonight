@@ -189,12 +189,69 @@ class Game:
             player_spawn=(100, self.ground_y - 70),
             bg_path="assets/images/backgrounds/bg_2.png"
         )
+        # ---------------- LEVEL 7 ----------------
+        level7 = Level(
+            platforms=[
+                Platform(0, 520, 250, 20),
+                Platform(350, 520, 200, 20),
+                Platform(650, 520, 150, 20),
+
+                Platform(100, 420, 120, 20),
+                Platform(300, 380, 120, 20),
+                Platform(500, 340, 120, 20),
+
+                # CUT-CUT TOP PATH
+                Platform(50, 260, 80, 20),
+                Platform(180, 230, 70, 20),
+                Platform(300, 200, 70, 20),
+                Platform(420, 170, 70, 20),
+
+                #Final tiny platform near exit
+                Platform(20, 120, 60, 20),
+            ],
+
+            spikes=[
+                #Ground punish
+                Spike(250, self.ground_y - 30, 30, 30),
+                Spike(280, self.ground_y - 30, 30, 30),
+                Spike(310, self.ground_y - 30, 30, 30),
+
+                #Under platform spikes
+                Spike(120, 440, 30, 30),
+                Spike(320, 400, 30, 30),
+                Spike(520, 360, 30, 30),
+
+                #Above platform spikes
+                Spike(100, 390, 30, 30),
+                Spike(300, 350, 30, 30),
+                Spike(500, 310, 30, 30),
+
+                #Cut path spikes
+                Spike(200, 200, 30, 30),
+                Spike(230, 200, 30, 30),
+
+                Spike(340, 170, 30, 30),
+                Spike(370, 170, 30, 30),
+
+                Spike(60, 90, 30, 30),
+                Spike(90, 90, 30, 30),
+            ],
+
+            doors=[
+                Door(10, 40, 60, 80, "exit"), #TOP LEFT DOOR CORNER
+                Door(20, self.ground_y - 80, 60, 80, "entrance")
+            ],
+
+            player_spawn=(30, self.ground_y - 70),
+            bg_path="assets/images/backgrounds/bg_2.png"
+        )
         
         self.level_manager.add_level(1, level1)
         self.level_manager.add_level(2, level2)
         self.level_manager.add_level(3, level3)
         self.level_manager.add_level(4, level4)
         self.level_manager.add_level(5, level5)
+        self.level_manager.add_level(7, level7)
 
         self.current_level_id = 1
         self.current_level = self.level_manager.load(self.current_level_id)
