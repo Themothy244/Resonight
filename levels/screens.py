@@ -107,7 +107,7 @@ class Screens:
 
             self.screen.blit(title, (WIDTH // 2 - title.get_width() // 2, 120))
             self.screen.blit(time_text, (WIDTH//2 - time_text.get_width()//2, 220))
-            self.screen.blit(ping_text, (150, 220))
+            self.screen.blit(ping_text, (130, 220))
             self.screen.blit(lives_text, (650, 220))
             self.screen.blit(score_text, (WIDTH//2 - score_text.get_width()//2, 270))
             self.screen.blit(rank_text, (WIDTH//2 - rank_text.get_width()//2, 320))
