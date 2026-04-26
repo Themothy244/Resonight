@@ -138,23 +138,22 @@ def load_levels(self):
     # ---------------- LEVEL 6 ----------------
     level6 = Level(
         platforms=[
-            Platform(165, 640, 150, 20),
-            Platform(380, 520, 180, 20),
-            Platform(599, 380, 400, 20),
+            Platform(800, 330, 160, 20),
+            Platform(500, 330, 130, 20),
+            Platform(200, 400, 160, 20),
+            Platform(380, 540, 300, 20),
         ],
         spikes=[
-            Spike(320, 670, 30, 30),
-            Spike(350, 670, 30, 30),
-            Spike(550, 540, 30, 30),
-            Spike(580, 540, 30, 30),
-            Spike(610, 540, 30, 30),
-            Spike(800, 350, 30, 30),
-            Spike(830, 350, 30, 30),
-            Spike(860, 350, 30, 30),
+            Spike(180, 650, 30, 30),
+            Spike(770, 650, 30, 30),
+            Spike(800, 650, 30, 30),
+            Spike(380, 510, 30, 30),
+            Spike(410, 510, 30, 30),
+            Spike(440, 510, 30, 30),
         ],
         doors=[
             Door(50, self.ground_y - 80, 60, 80, "entrance"),
-            Door(888, 305, 60, 80, "exit"),
+            Door(900, 250, 60, 80, "exit"),
         ],
         player_spawn=(120, 550),
         bg_path="assets/images/backgrounds/bg_2.png"
@@ -162,44 +161,40 @@ def load_levels(self):
     # ---------------- LEVEL 7 ----------------
     level7 = Level(
         platforms=[
-            Platform(0, 530, 250, 20),
-            Platform(350, 550, 200, 20),
-            Platform(650, 550, 150, 20),
-            Platform(100, 440, 140, 20),
-            Platform(300, 400, 140, 20),
-            Platform(500, 360, 140, 20),
-            Platform(50, 300, 90, 20),
-            Platform(180, 270, 90, 20),
-            Platform(300, 240, 90, 20),
-            Platform(420, 210, 130, 20),
-            Platform(20, 140, 110, 20),
+            Platform(520, 580, 160, 20),
+            Platform(300, 440, 200, 20),
+            Platform(0, 360, 200, 20),
+            Platform(600, 360, 140, 20),
+            Platform(300, 260, 200, 20),
+            Platform(0, 160, 200, 20),
         ],
+
         spikes=[
-            Spike(130, 410, 30, 30),
-            Spike(330, 370, 30, 30),
-            Spike(530, 330, 30, 30),
-            Spike(210, 240, 30, 30),
-            Spike(240, 210, 30, 30),
-            Spike(340, 170, 30, 30),
-            Spike(370, 170, 30, 30),
+            Spike(300, 650, 30, 30),
+            Spike(330, 650, 30, 30),
+            Spike(360, 650, 30, 30),
+            Spike(300, 410, 30, 30),
+            Spike(360, 230, 30, 30),
+            Spike(390, 230, 30, 30),
+            Spike(520, 550, 30, 30),
         ],
         doors=[
-            Door(20, 60, 60, 80, "exit"), #TOP LEFT DOOR CORNER
-            Door(20, self.ground_y - 80, 60, 80, "entrance")
+            Door(20, 600, 60, 80, "entrance"),   
+            Door(20, 80, 60, 80, "exit")        
         ],
-        player_spawn=(30, self.ground_y - 70),
+        player_spawn=(40, 580),
         bg_path="assets/images/backgrounds/bg_2.png"
     )
 
     # ---------------- LEVEL 8 ----------------
     level8 = Level(
         platforms=[
-            Platform(400, 560, 130, 20),
-            Platform(260, 430, 240, 20),
-            Platform(470, 330, 160, 20),
+            Platform(400, 600, 130, 20),
             Platform(560, 500, 190, 20),
-            Platform(640, 240, 150, 20),
-            Platform(820, 160, 200, 20),
+            Platform(200, 430, 240, 20),
+            Platform(470, 330, 160, 20),
+            Platform(680, 240, 100, 20),
+            Platform(840, 160, 150, 20),
         ],
         spikes=[ 
             Spike(600, 300, 30, 30),
@@ -209,13 +204,10 @@ def load_levels(self):
             Spike(690, 470, 30, 30),
             Spike(660, 470, 30, 30),
             Spike(630, 470, 30, 30),
-            Spike(700, 210, 30, 30),
-            Spike(730, 210, 30, 30),
-            Spike(760, 210, 30, 30),
         ],
         doors=[
             Door(50, self.ground_y - 80, 60, 80, "entrance"),
-            Door(860, 80, 60, 80, "exit"),
+            Door(880, 80, 60, 80, "exit"),
         ],
         player_spawn=(120, self.ground_y - 70),
         bg_path="assets/images/backgrounds/bg_2.png"
@@ -227,8 +219,8 @@ def load_levels(self):
             Platform(200, 550, 150, 20),
             Platform(400, 450, 150, 20),
             Platform(100, 350, 150, 20),
-            Platform(860, 350, 150, 20),
             Platform(400, 250, 250, 20),
+            Platform(800, 350, 200, 20),
         ],
         spikes=[
             Spike(210, 650, 30, 30),
@@ -262,7 +254,6 @@ def load_levels(self):
             Spike(470, 220, 30, 30),
             Spike(500, 220, 30, 30),
             Spike(530, 220, 30, 30),
-            Spike(560, 220, 30, 30),
         ],
         doors=[
             Door(50, self.ground_y - 80, 60, 80, "entrance"),
@@ -276,12 +267,12 @@ def load_levels(self):
     level10 = Level(
         platforms=[
             Platform(400, 550, 400, 20),
-            Platform(520, 458, 150, 15),
-            Platform(250, 450, 150, 15),
-            Platform(400, 320, 150, 15),
-            Platform(700, 380, 150, 15),
-            Platform(600, 130, 250, 15),
-            Platform(250, 230, 180, 15),
+            Platform(520, 458, 150, 20),
+            Platform(250, 450, 150, 20),
+            Platform(400, 320, 150, 20),
+            Platform(700, 380, 150, 20),
+            Platform(600, 130, 250, 20),
+            Platform(250, 230, 180, 20),
         ],
         spikes=[
             Spike(770, 520, 30, 30),
