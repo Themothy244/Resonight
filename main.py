@@ -97,7 +97,6 @@ class Game:
 
         if self.lives <= 0:
             self.deathReason = "lives"
-            self.reset_game()
 
         self.start_transition(self.GAME_OVER)
 
@@ -172,6 +171,9 @@ class Game:
                             self.reset_player()
                             self.start_transition(self.LEVEL)
 
+                            if self.lives <= 0:
+                                self.reset_game()
+
                     if self.nextlevel.back_btn.collidepoint(event.pos):
                             self.reset_player()
                             self.start_transition(self.MENU)
@@ -216,7 +218,6 @@ class Game:
                 self.start_transition(self.GAME_OVER)
 
                 if self.lives <= 0:
-                    self.reset_game()
                     self.deathReason = "lives"
                 break
         
@@ -302,6 +303,7 @@ class Game:
             elif self.state == self.GAME_OVER:
                 self.screen.fill((20, 0, 0))
                 self.nextlevel.currentlevel = self.deathReason
+                self.nextlevel.lives = self.lives
                 self.nextlevel.draw_game_over(mouse_pos)
 
             elif self.state == self.WIN:
