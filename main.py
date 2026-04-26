@@ -41,6 +41,14 @@ class Game:
         self.win_pings = 0
         self.win_lives = 0
 
+        self.run_total_time = 0
+        self.run_total_pings = 0
+
+        self.final_time = 0
+        self.final_pings = 0
+        self.final_score = 0
+        self.final_rank = "C"
+
         # ================= INPUT & FLAGS =================
         self.hasNextLevel = True
 
@@ -90,6 +98,11 @@ class Game:
         self.current_level_id = 1
         self.current_level = self.level_manager.load(1)
         self.reset_player()
+
+        self.run_total_time = 0
+        self.run_total_pings = 0
+        self.final_score = 0
+        self.final_rank = "C"
         
     def handle_death(self, reason):
         self.lives -= 1
@@ -229,9 +242,25 @@ class Game:
                 self.win_time = self.timer.time_left
                 self.win_pings = self.totalPings
                 self.win_lives = self.lives
+                self.run_total_time += self.timer.time_left
+                self.run_total_pings += self.totalPings
 
                 next_id = self.current_level_id + 1
                 self.hasNextLevel = self.level_manager.has_level(next_id)
+                if not self.hasNextLevel:
+                    self.final_time = self.run_total_time
+                    self.final_pings = self.run_total_pings
+
+                    self.final_score = int((self.final_time * 10) + (self.lives * 100) - (self.final_pings * 5))
+
+                    if self.final_score >= 2000:
+                        self.final_rank = "S"
+                    elif self.final_score >= 1500:
+                        self.final_rank = "A"
+                    elif self.final_score >= 1000:
+                        self.final_rank = "B"
+                    else:
+                        self.final_rank = "C"
                 self.start_transition(self.WIN)
 
         self.player.rect.x = max(0, min(self.player.rect.x, WIDTH - self.player.rect.width))
@@ -313,6 +342,11 @@ class Game:
                 self.nextlevel.lives = self.win_lives
                 self.nextlevel.hasNextLevel = self.hasNextLevel
                 self.nextlevel.isFinalLevel = not self.hasNextLevel
+
+                self.nextlevel.final_time = self.final_time
+                self.nextlevel.final_pings = self.final_pings
+                self.nextlevel.final_score = self.final_score
+                self.nextlevel.final_rank = self.final_rank
 
                 self.nextlevel.draw_win(mouse_pos)
 

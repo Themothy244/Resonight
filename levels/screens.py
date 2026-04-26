@@ -12,9 +12,16 @@ class Screens:
         self.isFinalLevel = False
         self.lives = lives
 
+        self.final_time = 0
+        self.final_pings = 0
+        self.final_score = 0
+        self.final_rank = "C"
+
         self.font_inter = pygame.font.SysFont("Inter", 84, bold=True)
         self.font_inter_medium = pygame.font.SysFont("Inter", 60, bold=True)
         self.font_courier = pygame.font.SysFont("courier", 32)
+        self.font_courier_lg = pygame.font.SysFont("courier", 40)
+        self.font_courier_sm = pygame.font.SysFont("courier", 24)
         self.font_time = pygame.font.SysFont("arial", 30)
         self.font_ping = pygame.font.SysFont("arial", 30)
         self.font_btn = pygame.font.SysFont("arial", 35)
@@ -90,19 +97,31 @@ class Screens:
 
         if self.isFinalLevel:
             title = self.font_inter_medium.render("You Escaped the Darkness", True, (255, 255, 255))
+
+            time_text = self.font_courier_sm.render(f"Time Saved: {self.final_time:.2f}s", True, (255, 255, 255))
+            ping_text = self.font_courier_sm.render(f"Pings Used: {self.final_pings}", True, (255, 255, 255))
+            lives_text = self.font_courier_sm.render(f"Lives Left: {self.lives}", True, (255, 255, 255))
+
+            score_text = self.font_courier_lg.render(f"Score: {self.final_score}", True, (255, 255, 255))
+            rank_text = self.font_courier_lg.render(f"Rank: {self.final_rank}", True, (255, 255, 255))
+
+            self.screen.blit(title, (WIDTH // 2 - title.get_width() // 2, 120))
+            self.screen.blit(time_text, (WIDTH//2 - time_text.get_width()//2, 220))
+            self.screen.blit(ping_text, (150, 220))
+            self.screen.blit(lives_text, (650, 220))
+            self.screen.blit(score_text, (WIDTH//2 - score_text.get_width()//2, 270))
+            self.screen.blit(rank_text, (WIDTH//2 - rank_text.get_width()//2, 320))
         else:
             title = self.font_inter_medium.render(f"Level {self.currentlevel} Complete", True, (255, 255, 255))
+            self.screen.blit(title, (WIDTH // 2 - title.get_width() // 2, 120))
 
-        self.screen.blit(title, (WIDTH // 2 - title.get_width() // 2, 120))
+            time = self.font_courier.render(f"Time left: {self.timeLeft:0.2f}", True, (255, 255, 255))
+            ping = self.font_courier.render(f"Total Ping: {self.totalPings}", True, (255, 255, 255))
 
-        time = self.font_courier.render(f"Time left: {self.timeLeft:0.2f}", True, (255, 255, 255))
-        ping = self.font_courier.render(f"Total Ping: {self.totalPings}", True, (255, 255, 255))
+            self.screen.blit(time, (WIDTH // 2 - time.get_width() // 2, 200))
+            self.screen.blit(ping, (WIDTH // 2 - ping.get_width() // 2, 260))
 
-
-        self.screen.blit(time, (WIDTH // 2 - time.get_width() // 2, 200))
-        self.screen.blit(ping, (WIDTH // 2 - ping.get_width() // 2, 260))
-
-        self.draw_lives()
+            self.draw_lives()
         # ================= NEXT BUTTON =================
         hover = self.next_level_btn.collidepoint(mouse_pos)
 
