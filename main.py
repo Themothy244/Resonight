@@ -423,7 +423,7 @@ class Game:
         self.ping = PingSystem((WIDTH, HEIGHT))
         self.mask = MaskSystem((WIDTH, HEIGHT), self.vignette)
         self.timer = TimerSystem(30.0, self.clock_tick)
-        self.nextlevel = Screens(self.screen, self.level_manager.current_level, self.timer.time_left, self.totalPings, self.lives)
+        self.nextlevel = Screens(self.screen, self.current_level_id, self.timer.time_left, self.totalPings, self.lives)
 
     # =========================================================
     #                     STATE CONTROL
@@ -433,6 +433,22 @@ class Game:
         self.timer.reset()
         self.totalPings = 0
         self.ping.reset()
+
+    def reset_game(self):
+        self.lives = 3
+        self.current_level_id = 1
+        self.current_level = self.level_manager.load(1)
+        self.reset_player()
+        
+    def handle_death(self, reason):
+        self.lives -= 1
+        self.deathReason = reason
+
+        if self.lives <= 0:
+            self.deathReason = "lives"
+            self.reset_game()
+
+        self.start_transition(self.GAME_OVER)
 
     def start_transition(self, new_state):
         if not self.transitioning:
@@ -459,6 +475,7 @@ class Game:
     # =========================================================
     def handle_events(self):
         if self.transitioning:
+            pygame.event.clear()
             return
         
         for event in pygame.event.get():
@@ -490,9 +507,7 @@ class Game:
                             self.load_next_level()
                         else:
                             # FINAL → RESTART GAME
-                            self.current_level_id = 1
-                            self.current_level = self.level_manager.load(1)
-                            self.reset_player()
+                            self.reset_game()
 
                             self.start_transition(self.LEVEL)
 
@@ -503,7 +518,7 @@ class Game:
             elif self.state == self.GAME_OVER:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.nextlevel.again_btn.collidepoint(event.pos):
-                            self.current_level = self.level_manager.load(self.level_manager.current_level)
+                            self.current_level = self.level_manager.load(self.current_level_id)
                             self.reset_player()
                             self.start_transition(self.LEVEL)
 
@@ -546,17 +561,13 @@ class Game:
         for s in self.current_level.spikes:
             if self.player.rect.colliderect(s.rect):
                 self.ping.reset()
-                self.lives -= 1
+                self.handle_death("spike")
                 self.timer.stop_tick()
-                self.deathReason = "spike"
                 self.start_transition(self.GAME_OVER)
 
                 if self.lives <= 0:
-                    self.lives = 3
-                    self.current_level_id = 1
-                    self.current_level = self.level_manager.load(1)
+                    self.reset_game()
                     self.deathReason = "lives"
-                    self.player = Player(*self.current_level.player_spawn, 40, 40)
                 break
         
         for d in self.current_level.doors:
@@ -597,16 +608,11 @@ class Game:
         dt = self.clock.get_time() / 1000
 
         if self.timer.update(dt):
-            self.lives -= 1
-            self.deathReason = "time"
-            
+            self.handle_death("time")
 
             if self.lives <= 0:
-                self.lives = 3
-                self.current_level_id = 1
-                self.current_level = self.level_manager.load(1)
+                self.reset_game()
                 self.deathReason = "lives"
-                self.player = Player(*self.current_level.player_spawn, 40, 40)
 
             self.start_transition(self.GAME_OVER)
         
