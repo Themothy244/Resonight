@@ -9,6 +9,9 @@ class Player:
         self.gravity = 0.5
         self.jump_strength = 13
 
+        self.current_platform = None
+        self.on_platform = False
+
     def on_ground_or_platform(self, platforms, ground_y):
         if self.rect.bottom >= ground_y:
             return True
@@ -40,6 +43,8 @@ class Player:
                 if dy > 0:
                     self.rect.bottom = p.rect.top
                     dy = 0
+                    self.on_platform = True
+                    self.current_platform = p
                 elif dy < 0:
                     self.rect.top = p.rect.bottom
                     dy = 0
@@ -47,6 +52,8 @@ class Player:
         return dy
 
     def update(self, keys, platforms, ground_y):
+        self.on_platform = False
+        self.current_platform = None
         dx = 0
 
         if keys[pygame.K_LEFT]:
@@ -60,9 +67,17 @@ class Player:
         self.y_velocity += self.gravity
         self.y_velocity = self.move_and_collide(platforms, dx, self.y_velocity)
 
+        if self.on_platform and self.current_platform:
+            if self.current_platform.platformType == "moving":
+                platform_dx = self.current_platform.rect.x - self.current_platform.prev_x
+                self.rect.x += platform_dx
+            self.rect.bottom = self.current_platform.rect.top
+
         if self.rect.bottom >= ground_y:
             self.rect.bottom = ground_y
             self.y_velocity = 0
+
+        self.prev_x = self.rect.x
 
     def draw(self, screen):
         pygame.draw.rect(screen, WHITE, self.rect)
