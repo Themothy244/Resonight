@@ -296,6 +296,8 @@ class Game:
 
             self.start_transition(self.GAME_OVER)
         
+        for platform in self.current_level.platforms:
+            platform.update()
         keys = pygame.key.get_pressed()
         self.player.update(keys, self.current_level.platforms, self.ground_y)
         self.ping.update()
