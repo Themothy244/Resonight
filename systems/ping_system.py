@@ -3,7 +3,7 @@ import pygame
 class PingSystem:
     def __init__(self, screen_size):
         self.radius = 0
-        self.max_radius = 350
+        self.max_radius = 280
         self.speed = 30
 
         self.growing = False
