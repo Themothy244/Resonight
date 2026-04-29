@@ -5,10 +5,9 @@ from settings import WHITE
 BUFF_SIZE = 30
 
 class Buff:
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, bufftype):
         self.rect = pygame.Rect(x, y, BUFF_SIZE, BUFF_SIZE)
-
-        self.type = random.choice(["timer", "lives"])
+        self.type = bufftype
 
         try:
             if self.type == "timer":
@@ -35,7 +34,7 @@ class Buff:
         elif self.type == "timer":
             game.timer.time_left += 5
 
-    def try_spawn_buff(width, height, platforms, spikes, ground_rect):
+    def try_spawn_buff(width, height, platforms, spikes, ground_rect, lives):
         if random.random() < 0.40:
             valid_surfaces =  platforms + spikes + [ground_rect]
 
@@ -47,7 +46,12 @@ class Buff:
             x = random.randint(surface.rect.left, surface.rect.right - BUFF_SIZE)
             y = surface.rect.top - BUFF_SIZE - 30
 
-            return Buff(x, y, width, height)
+            if lives >= 3:
+                bufftype = "timer"
+            else:
+                bufftype = random.choice(["timer", "lives"])
+
+            return Buff(x, y, width, height, bufftype)
         else:
             return None
 
