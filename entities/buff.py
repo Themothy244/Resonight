@@ -34,17 +34,18 @@ class Buff:
         elif self.type == "timer":
             game.timer.time_left += 5
 
-    def try_spawn_buff(width, height, platforms, spikes, ground_rect, lives):
+    def try_spawn_buff(width, height, platforms, ground_rect, lives):
         if random.random() < 0.40:
-            valid_surfaces =  platforms + spikes + [ground_rect]
+            valid_surfaces =  platforms + [ground_rect]
 
             if not valid_surfaces:
                 return None
 
             surface = random.choice(valid_surfaces)
+            rect = surface.rect if hasattr(surface, "rect") else surface
 
-            x = random.randint(surface.rect.left, surface.rect.right - BUFF_SIZE)
-            y = surface.rect.top - BUFF_SIZE - 30
+            x = random.randint(rect.left, rect.right - BUFF_SIZE)
+            y = rect.top - BUFF_SIZE - 30
 
             if lives >= 3:
                 bufftype = "timer"
