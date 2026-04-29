@@ -57,7 +57,7 @@ class Player:
         self.jump_strength = 13
 
         # IMPORTANT: hitbox based on sprite size (NOT constructor width/height)
-        self.hitbox = pygame.Rect(0, 0, self.rect.width * 0.6, self.rect.height * 0.9)
+        self.hitbox = pygame.Rect(0, 0, self.rect.width * 0.5, self.rect.height * 0.9)
         self.hitbox.midbottom = self.rect.midbottom
 
         # platform state
