@@ -72,7 +72,7 @@ class Game:
         self.current_level_id = 1
         self.current_level = self.level_manager.load(self.current_level_id)
         ground_rect = pygame.Rect(0, self.ground_y, WIDTH, 40)
-        self.buff =  Buff.try_spawn_buff(WIDTH, HEIGHT, self.current_level.platforms, self.current_level.spikes, ground_rect)
+        self.buff =  Buff.try_spawn_buff(WIDTH, HEIGHT, self.current_level.platforms, self.current_level.spikes, ground_rect, self.lives)
         
         # ================= ASSETS =================
         self.vignette = pygame.image.load("assets/images/effects/Vignette.png").convert_alpha()
@@ -133,7 +133,7 @@ class Game:
 
             self.current_level = self.level_manager.load(next_id)
             ground_rect = pygame.Rect(0, self.ground_y, WIDTH, 40)
-            self.buff = Buff.try_spawn_buff(WIDTH, HEIGHT, self.current_level.platforms, self.current_level.spikes, ground_rect)
+            self.buff = Buff.try_spawn_buff(WIDTH, HEIGHT, self.current_level.platforms, self.current_level.spikes, ground_rect, self.lives)
             self.start_transition(self.LEVEL)
         else:
             self.current_level_id = 1
