@@ -212,8 +212,8 @@ class Game:
     # =========================================================
     def update_reveal(self):
         for obj in self.current_level.get_all_objects():
-            # if self.ping.active and self.ping.circle_rect_collision(self.ping.origin, self.ping.radius, obj.rect):
-            if True:
+            if self.ping.active and self.ping.circle_rect_collision(self.ping.origin, self.ping.radius, obj.rect):
+            # if True:
                 obj.visible_timer = 10
 
             if obj.visible_timer > 0:
@@ -321,7 +321,7 @@ class Game:
         if self.buff:
             self.buff.draw(self.screen)
         self.ping.draw(self.screen)
-        # self.mask.draw(self.screen, self.ping)
+        self.mask.draw(self.screen, self.ping)
         self.player.draw(self.screen)
         self.hud.draw(self.screen, self.current_level_id, self.timer.time_left, self.totalPings, self.lives)
 
