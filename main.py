@@ -72,7 +72,7 @@ class Game:
         self.current_level_id = 1
         self.current_level = self.level_manager.load(self.current_level_id)
         ground_rect = pygame.Rect(0, self.ground_y, WIDTH, 40)
-        self.buff =  Buff.try_spawn_buff(WIDTH, HEIGHT, self.current_level.platforms, self.current_level.spikes, ground_rect, self.lives)
+        self.buff =  Buff.try_spawn_buff(WIDTH, HEIGHT, self.current_level.platforms, ground_rect, self.lives)
         
         # ================= ASSETS =================
         self.vignette = pygame.image.load("assets/images/effects/Vignette.png").convert_alpha()
@@ -133,7 +133,7 @@ class Game:
 
             self.current_level = self.level_manager.load(next_id)
             ground_rect = pygame.Rect(0, self.ground_y, WIDTH, 40)
-            self.buff = Buff.try_spawn_buff(WIDTH, HEIGHT, self.current_level.platforms, self.current_level.spikes, ground_rect, self.lives)
+            self.buff = Buff.try_spawn_buff(WIDTH, HEIGHT, self.current_level.platforms, ground_rect, self.lives)
             self.start_transition(self.LEVEL)
         else:
             self.current_level_id = 1
@@ -212,7 +212,7 @@ class Game:
     # =========================================================
     def update_reveal(self):
         for obj in self.current_level.get_all_objects():
-            #if self.ping.active and self.ping.circle_rect_collision(self.ping.origin, self.ping.radius, obj.rect):
+            # if self.ping.active and self.ping.circle_rect_collision(self.ping.origin, self.ping.radius, obj.rect):
             if True:
                 obj.visible_timer = 10
 
@@ -321,7 +321,7 @@ class Game:
         if self.buff:
             self.buff.draw(self.screen)
         self.ping.draw(self.screen)
-        #self.mask.draw(self.screen, self.ping)
+        # self.mask.draw(self.screen, self.ping)
         self.player.draw(self.screen)
         self.hud.draw(self.screen, self.current_level_id, self.timer.time_left, self.totalPings, self.lives)
 
