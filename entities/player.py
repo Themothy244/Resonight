@@ -14,6 +14,46 @@ class Player:
         self.current_platform = None
         self.on_platform = False
 
+        self.sprite_sheet = pygame.image.load("assets\images\entities\white_character.png").convert_alpha()
+        self.animations = {
+            "idle": [],
+            "run": [],
+            "jump": []
+        }
+
+        self.state = "idle"
+        self.frame_index = 0
+        self.animation_speed = 0.15
+        self.facing_right = True
+
+        def get_image(sheet, x, y, width, height):
+            image = pygame.Surface((width, height), pygame.SRCALPHA)
+            image.blit(sheet, (0, 0), (x, y, width, height))
+            return image
+
+        frame_width = 32
+        frame_height = 32
+        scale = 1.5
+
+        rows = {
+            "idle": 0,
+            "run": 1,
+            "jump": 2
+        }
+
+        for state, row in rows.items():
+            for col in range(16):
+                x = col * frame_width
+                y = row * frame_height
+
+                frame = get_image(self.sprite_sheet, x, y, frame_width, frame_height)
+                frame = pygame.transform.scale(frame, (frame_width * scale, frame_height * scale))
+
+                self.animations[state].append(frame)
+
+        self.image = self.animations["idle"][0]
+        self.rect = self.image.get_rect(topleft=(self.rect.x, self.rect.y))
+
     def on_ground_or_platform(self, platforms, ground_y):
         if self.rect.bottom >= ground_y:
             return True
@@ -88,5 +128,34 @@ class Player:
 
         self.prev_x = self.rect.x
 
+        # ================= ANIMATION =================
+        previous_state = self.state
+        if not self.on_ground_or_platform(platforms, ground_y):
+            self.state = "jump"
+        elif dx != 0:
+            self.state = "run"
+        else:
+            self.state = "idle"
+
+        if self.state != previous_state:
+            self.frame_index = 0
+
+        if dx < 0:
+            self.facing_right = False
+        elif dx > 0:
+            self.facing_right = True
+
+        frames = self.animations[self.state]
+
+        self.frame_index += self.animation_speed
+        if self.frame_index >= len(frames):
+            self.frame_index = 0
+
+        self.image = frames[int(self.frame_index)]
+
+        if not self.facing_right:
+            self.image = pygame.transform.flip(self.image, True, False)
+
     def draw(self, screen):
-        pygame.draw.rect(screen, WHITE, self.rect)
+        pygame.draw.rect(screen, (255, 0, 0), self.rect, 2)
+        screen.blit(self.image, self.rect)
