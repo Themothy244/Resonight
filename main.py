@@ -13,6 +13,7 @@ from systems.timer_system import TimerSystem
 from levels.level_manager import LevelManager
 from levels.screens import Screens
 from levels.hud import HUD
+from entities.buff import Buff
 
 class Game:
     def __init__(self):
@@ -70,6 +71,8 @@ class Game:
 
         self.current_level_id = 1
         self.current_level = self.level_manager.load(self.current_level_id)
+        ground_rect = pygame.Rect(0, self.ground_y, WIDTH, 40)
+        self.buff =  Buff.try_spawn_buff(WIDTH, HEIGHT, self.current_level.platforms, self.current_level.spikes, ground_rect)
         
         # ================= ASSETS =================
         self.vignette = pygame.image.load("assets/images/effects/Vignette.png").convert_alpha()
@@ -110,6 +113,7 @@ class Game:
 
         if self.lives <= 0:
             self.deathReason = "lives"
+            self.buff = None
 
         self.start_transition(self.GAME_OVER)
 
@@ -128,6 +132,8 @@ class Game:
             self.current_level_id = next_id
 
             self.current_level = self.level_manager.load(next_id)
+            ground_rect = pygame.Rect(0, self.ground_y, WIDTH, 40)
+            self.buff = Buff.try_spawn_buff(WIDTH, HEIGHT, self.current_level.platforms, self.current_level.spikes, ground_rect)
             self.start_transition(self.LEVEL)
         else:
             self.current_level_id = 1
@@ -206,8 +212,8 @@ class Game:
     # =========================================================
     def update_reveal(self):
         for obj in self.current_level.get_all_objects():
-            if self.ping.active and self.ping.circle_rect_collision(self.ping.origin, self.ping.radius, obj.rect):
-            # if True:
+            #if self.ping.active and self.ping.circle_rect_collision(self.ping.origin, self.ping.radius, obj.rect):
+            if True:
                 obj.visible_timer = 10
 
             if obj.visible_timer > 0:
@@ -263,6 +269,10 @@ class Game:
                         self.final_rank = "C"
                 self.start_transition(self.WIN)
 
+        if self.buff and self.player.rect.colliderect(self.buff.rect):
+            self.buff.apply_effect(self)
+            self.buff = None
+
         self.player.rect.x = max(0, min(self.player.rect.x, WIDTH - self.player.rect.width))
 
     # =========================================================
@@ -308,8 +318,10 @@ class Game:
     def draw(self):
         self.screen.fill(BLACK)
         self.current_level.draw(self.screen)
+        if self.buff:
+            self.buff.draw(self.screen)
         self.ping.draw(self.screen)
-        self.mask.draw(self.screen, self.ping)
+        #self.mask.draw(self.screen, self.ping)
         self.player.draw(self.screen)
         self.hud.draw(self.screen, self.current_level_id, self.timer.time_left, self.totalPings, self.lives)
 
