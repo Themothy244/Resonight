@@ -230,7 +230,7 @@ class Game:
             return
         
         for s in self.current_level.spikes:
-            if self.player.rect.colliderect(s.rect):
+            if self.player.hitbox.colliderect(s.rect):
                 self.ping.reset()
                 self.handle_death("spike")
                 self.timer.stop_tick()
@@ -241,7 +241,7 @@ class Game:
                 break
         
         for d in self.current_level.doors:
-            if d.doorType == "exit" and self.player.rect.colliderect(d.rect):
+            if d.doorType == "exit" and self.player.hitbox.colliderect(d.rect):
                 self.ping.reset()
                 self.timer.stop_tick()
                 self.win_level = self.current_level_id
@@ -269,11 +269,11 @@ class Game:
                         self.final_rank = "C"
                 self.start_transition(self.WIN)
 
-        if self.buff and self.player.rect.colliderect(self.buff.rect):
+        if self.buff and self.player.hitbox.colliderect(self.buff.rect):
             self.buff.apply_effect(self)
             self.buff = None
 
-        self.player.rect.x = max(0, min(self.player.rect.x, WIDTH - self.player.rect.width))
+        self.player.hitbox.x = max(0, min(self.player.hitbox.x, WIDTH - self.player.hitbox.width))
 
     # =========================================================
     #                STATE TRANSITION EFFECTS
