@@ -12,7 +12,7 @@ class Level:
         self.bg = pygame.transform.scale(self.bg, (WIDTH, HEIGHT))
 
     def draw(self, screen):
-        self.bg.set_alpha(25)
+        self.bg.set_alpha(50)
         screen.blit(self.bg, (0, 0))
 
         for p in self.platforms:
