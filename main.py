@@ -78,6 +78,8 @@ class Game:
         self.vignette = pygame.image.load("assets/images/effects/Vignette.png").convert_alpha()
         self.finger_snap = pygame.mixer.Sound("assets/sounds/Finger_snap.mp3")
         self.clock_tick = pygame.mixer.Sound("assets/sounds/clock_tick.mp3")
+        pygame.mixer.music.load("assets/sounds/bg_music.ogg")
+        pygame.mixer.music.play(-1)
 
         # ================= GAME SYSTEMS =================
         self.hud = HUD()
@@ -314,6 +316,8 @@ class Game:
         self.check_collisions()
         self.update_reveal()
         self.mask.update(self.ping)
+        if self.buff:
+            self.buff.update()
     
     def draw(self):
         self.screen.fill(BLACK)
