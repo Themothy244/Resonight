@@ -10,10 +10,13 @@ class Level:
 
         self.bg = pygame.image.load(bg_path).convert()
         self.bg = pygame.transform.scale(self.bg, (WIDTH, HEIGHT))
+        self.ground = pygame.image.load("assets/images/entities/ground.png").convert_alpha()
+        self.ground = pygame.transform.scale(self.ground, (WIDTH, 5))
 
     def draw(self, screen):
-        self.bg.set_alpha(50)
+        self.bg.set_alpha(20)
         screen.blit(self.bg, (0, 0))
+        screen.blit(self.ground, (0, HEIGHT - 40))
 
         for p in self.platforms:
             p.draw(screen)
