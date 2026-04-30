@@ -11,7 +11,7 @@ class PingSystem:
         self.fading = False
 
         self.timer = 0
-        self.hold_time = 10
+        self.hold_time = 20
 
         self.alpha = 255
         self.origin = (0, 0)
