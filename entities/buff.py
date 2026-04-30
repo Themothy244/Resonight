@@ -1,26 +1,62 @@
 import pygame
 import random 
 from settings import WHITE
-
-BUFF_SIZE = 30
-
+BUFF_SIZE = 32
 class Buff:
     def __init__(self, x, y, width, height, bufftype):
         self.rect = pygame.Rect(x, y, BUFF_SIZE, BUFF_SIZE)
         self.type = bufftype
 
+        self.frames = []
+        self.frame_index = 0
+        self.animation_speed = 0.2
+
         try:
             if self.type == "timer":
-                self.image = pygame.image.load("assets/images/entities/timer_icon.png").convert_alpha()
-            
+                sheet = pygame.image.load("assets/images/entities/buff.png").convert_alpha()
             else:
-                self.image = pygame.image.load("assets/images/entities/health_icon.png").convert_alpha()
+                sheet = pygame.image.load("assets/images/entities/buff.png").convert_alpha()
 
-            self.image =  pygame.transform.smoothscale(self.image, (BUFF_SIZE, BUFF_SIZE))
-        
+            frame_width = 32
+            frame_height = 32
+            scale = BUFF_SIZE / 32
+
+            for col in range(13):
+                x = col * frame_width
+                if self.type == "lives":
+                    row = 0
+                elif self.type == "timer":
+                    row = 1
+                else:
+                    row = 0
+
+                y = row * frame_height
+
+                frame = pygame.Surface((frame_width, frame_height), pygame.SRCALPHA)
+                frame.blit(sheet, (0, 0), (x, y, frame_width, frame_height))
+
+                frame = pygame.transform.scale(
+                    frame,
+                    (int(frame_width * scale), int(frame_height * scale))
+                )
+
+                self.frames.append(frame)
+
+            self.image = self.frames[0]
+
         except pygame.error:
+            self.frames = []
             self.image = None
     
+    def update(self):
+        if self.frames:
+            self.frame_index += self.animation_speed
+
+            if self.frame_index >= len(self.frames):
+                self.frame_index = 0
+
+            self.image = self.frames[int(self.frame_index)]
+
     def draw(self, screen):
         if self.image:
             screen.blit(self.image, self.rect)
