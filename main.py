@@ -206,7 +206,7 @@ class Game:
                         self.finger_snap.play()
                         self.ping.trigger(self.player.rect.center)
                         self.totalPings += 1
-                        self.timer.penalize(3)
+                        self.timer.penalize(2)
                         self.mask.trigger_open()
 
     # =========================================================
