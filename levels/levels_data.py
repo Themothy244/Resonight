@@ -7,8 +7,8 @@ def load_levels(self):
     # ---------------- LEVEL 1 ----------------
     level1 = Level(
         platforms=[
-            Platform(220, 550, 390, 20, "normal"),
-            Platform(550, 420, 530, 20, "normal"),
+            Platform(220, 550, 390, 30, "normal"),
+            Platform(550, 420, 530, 30, "normal"),
                 
         ],
         spikes=[
@@ -28,10 +28,10 @@ def load_levels(self):
     # ---------------- LEVEL 2 ----------------
     level2 = Level(
         platforms=[
-            Platform(300, 600, 140, 20, "normal"),
-            Platform(500, 550, 140, 20, "normal"),
-            Platform(700, 480, 140, 20, "normal"),
-            Platform(850, 420, 140, 20, "normal"),
+            Platform(300, 600, 140, 30, "normal"),
+            Platform(500, 550, 140, 30, "normal"),
+            Platform(700, 480, 140, 30, "normal"),
+            Platform(850, 420, 140, 30, "normal"),
         ],
         spikes=[
             Spike(240, 650, 30, 30),
@@ -49,9 +49,9 @@ def load_levels(self):
     # ---------------- LEVEL 3 ----------------
     level3 = Level(
         platforms=[
-            Platform(220, 540, 180, 20, "normal"),
-            Platform(600, 540, 165, 20, "normal"),
-            Platform(450, 400, 150, 20, "normal"),
+            Platform(220, 540, 180, 30, "normal"),
+            Platform(600, 540, 165, 30, "normal"),
+            Platform(450, 400, 150, 30, "normal"),
         ],
         spikes=[
             Spike(210, 650, 30, 30),
@@ -85,19 +85,19 @@ def load_levels(self):
     # ---------------- LEVEL 4 ----------------
     level4 = Level(
         platforms=[
-            Platform(0, 360, 200, 20, "normal"),
-            Platform(250, 480, 350, 20, "normal"),
-            Platform(680, 560, 150, 20, "normal"),
-            Platform(360, 250, 630, 20, "normal"),
+            Platform(0, 360, 200, 30, "normal"),
+            Platform(250, 470, 350, 30, "normal"),
+            Platform(680, 560, 150, 30, "normal"),
+            Platform(350, 250, 640, 30, "normal"),
         ],
         spikes=[
             Spike(560, 650, 30, 30),
             Spike(530, 650, 30, 30),
             Spike(500, 650, 30, 30),
             Spike(680, 530, 30, 30),
-            Spike(440, 450, 30, 30),
-            Spike(410, 450, 30, 30),
-            Spike(380, 450, 30, 30),
+            Spike(440, 440, 30, 30),
+            Spike(410, 440, 30, 30),
+            Spike(380, 440, 30, 30),
             Spike(630, 220, 30, 30),
             Spike(600, 220, 30, 30),
             Spike(570, 220, 30, 30),
@@ -112,18 +112,18 @@ def load_levels(self):
     # ---------------- LEVEL 5 ----------------
     level5 = Level(
         platforms=[
-            Platform(160, 240, 800, 20, "normal"),
-            Platform(0, 480, 800, 20, "normal"),
-            Platform(830, 590, 130, 20, "normal"),
-            Platform(0, 360, 130, 20, "normal"),
+            Platform(160, 240, 800, 30, "normal"),
+            Platform(0, 470, 800, 30, "normal"),
+            Platform(830, 590, 130, 30, "normal"),
+            Platform(0, 360, 130, 30, "normal"),
         ],
         spikes=[
             Spike(500, self.ground_y - 30, 30, 30),
             Spike(530, self.ground_y - 30, 30, 30),
             Spike(560, self.ground_y - 30, 30, 30),
-            Spike(360, 450, 30, 30),
-            Spike(390, 450, 30, 30),
-            Spike(420, 450, 30, 30),
+            Spike(360, 440, 30, 30),
+            Spike(390, 440, 30, 30),
+            Spike(420, 440, 30, 30),
             Spike(560, 210, 30, 30),
             Spike(590, 210, 30, 30),
             Spike(620, 210, 30, 30),
@@ -138,10 +138,10 @@ def load_levels(self):
     # ---------------- LEVEL 6 ----------------
     level6 = Level(
         platforms=[
-            Platform(800, 330, 160, 20, "normal"),
-            Platform(500, 330, 130, 20, "moving"),
-            Platform(200, 400, 160, 20, "normal"),
-            Platform(380, 540, 300, 20, "normal"),
+            Platform(800, 330, 160, 30, "normal"),
+            Platform(500, 330, 130, 30, "moving"),
+            Platform(200, 400, 160, 30, "normal"),
+            Platform(380, 540, 300, 30, "normal"),
         ],
         spikes=[
             Spike(180, 650, 30, 30),
@@ -161,12 +161,12 @@ def load_levels(self):
     # ---------------- LEVEL 7 ----------------
     level7 = Level(
         platforms=[
-            Platform(520, 580, 160, 20, "normal"),
-            Platform(300, 440, 200, 20, "normal"),
-            Platform(0, 360, 200, 20, "normal"),
-            Platform(600, 360, 140, 20, "moving"),
-            Platform(300, 260, 200, 20, "normal"),
-            Platform(0, 160, 200, 20, "normal"),
+            Platform(520, 580, 160, 30, "normal"),
+            Platform(300, 440, 200, 30, "normal"),
+            Platform(0, 360, 200, 30, "normal"),
+            Platform(600, 360, 140, 30, "moving"),
+            Platform(300, 260, 200, 30, "normal"),
+            Platform(0, 160, 200, 30, "normal"),
         ],
 
         spikes=[
@@ -189,17 +189,17 @@ def load_levels(self):
     # ---------------- LEVEL 8 ----------------
     level8 = Level(
         platforms=[
-            Platform(400, 600, 130, 20, "normal"),
-            Platform(560, 500, 190, 20, "normal"),
-            Platform(200, 430, 240, 20, "normal"),
-            Platform(470, 330, 160, 20, "normal"),
-            Platform(680, 240, 100, 20, "moving"),
-            Platform(840, 160, 150, 20, "normal"),
+            Platform(400, 600, 130, 30, "normal"),
+            Platform(560, 500, 190, 30, "normal"),
+            Platform(200, 430, 240, 30, "normal"),
+            Platform(470, 300, 160, 30, "normal"),
+            Platform(680, 220, 100, 30, "moving"),
+            Platform(840, 160, 150, 30, "normal"),
         ],
         spikes=[ 
-            Spike(600, 300, 30, 30),
-            Spike(570, 300, 30, 30),
-            Spike(540, 300, 30, 30),
+            Spike(600, 270, 30, 30),
+            Spike(570, 270, 30, 30),
+            Spike(540, 270, 30, 30),
             Spike(720, 470, 30, 30),
             Spike(690, 470, 30, 30),
             Spike(660, 470, 30, 30),
@@ -216,11 +216,11 @@ def load_levels(self):
     # ---------------- LEVEL 9 ----------------
     level9 = Level(
         platforms=[
-            Platform(200, 550, 150, 20, "normal"),
-            Platform(400, 450, 150, 20, "normal"),
-            Platform(100, 350, 150, 20, "normal"),
-            Platform(400, 250, 250, 20, "normal"),
-            Platform(800, 350, 200, 20, "normal"),
+            Platform(200, 550, 150, 30, "normal"),
+            Platform(400, 450, 150, 30, "normal"),
+            Platform(100, 350, 150, 30, "normal"),
+            Platform(400, 250, 250, 30, "normal"),
+            Platform(800, 350, 200, 30, "normal"),
         ],
         spikes=[
             Spike(210, 650, 30, 30),
@@ -266,13 +266,13 @@ def load_levels(self):
     # ---------------- LEVEL 10 ----------------
     level10 = Level(
         platforms=[
-            Platform(400, 550, 400, 20, "normal"),
-            Platform(520, 458, 150, 20, "normal"),
-            Platform(250, 450, 150, 20, "normal"),
-            Platform(400, 320, 150, 20, "normal"),
-            Platform(700, 380, 150, 20, "normal"),
-            Platform(600, 130, 250, 20, "normal"),
-            Platform(250, 230, 180, 20, "moving"),
+            Platform(400, 550, 400, 30, "normal"),
+            Platform(520, 450, 150, 30, "normal"),
+            Platform(200, 450, 150, 30, "normal"),
+            Platform(400, 320, 150, 30, "normal"),
+            Platform(700, 380, 150, 30, "normal"),
+            Platform(600, 130, 250, 30, "normal"),
+            Platform(250, 230, 180, 30, "moving"),
         ],
         spikes=[
             Spike(770, 520, 30, 30),
