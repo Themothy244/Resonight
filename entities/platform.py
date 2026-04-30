@@ -16,6 +16,14 @@ class Platform:
         self.direction = 1
         self.prev_x = x
 
+        self.bg_image = pygame.image.load("assets\images\entities\platform_transparent.png").convert_alpha()
+
+        img_w, img_h = self.bg_image.get_size()
+        scale = height / img_h
+        new_width = int(img_w * scale)
+
+        self.bg_scaled = pygame.transform.smoothscale(self.bg_image, (new_width, height))
+
     def update(self):
         self.prev_x = self.rect.x
 
@@ -30,5 +38,11 @@ class Platform:
 
     def draw(self, screen):
         if self.alpha > 0:
-            self.surface.set_alpha(int(self.alpha))
-            screen.blit(self.surface, self.rect.topleft)
+            previous_clip = screen.get_clip()
+            screen.set_clip(self.rect)
+
+            self.bg_scaled.set_alpha(int(self.alpha))
+            screen.blit(self.bg_scaled, self.rect.topleft)
+            self.bg_scaled.set_alpha(None)  
+
+            screen.set_clip(previous_clip)
