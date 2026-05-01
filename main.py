@@ -94,7 +94,7 @@ class Game:
         self.nextlevel = Screens(self.screen, self.current_level_id, self.timer.time_left, self.totalPings, self.lives)
         
         ground_rect = pygame.Rect(0, self.ground_y, WIDTH, 40)
-        self.buff =  Buff.try_spawn_buff(WIDTH, HEIGHT, self.current_level.platforms, ground_rect, self.lives)
+        self.buff =  Buff.try_spawn_buff(self.current_level.platforms, ground_rect, self.lives)
 
     # =========================================================
     #                     STATE CONTROL
@@ -106,7 +106,7 @@ class Game:
         self.ping.reset()
 
         ground_rect = pygame.Rect(0, self.ground_y, WIDTH, 40)
-        self.buff =  Buff.try_spawn_buff(WIDTH, HEIGHT, self.current_level.platforms, ground_rect, self.lives)
+        self.buff =  Buff.try_spawn_buff(self.current_level.platforms, ground_rect, self.lives)
 
     def reset_game(self):
         self.lives = 3
@@ -122,7 +122,7 @@ class Game:
         self.game_over_final = False
 
         ground_rect = pygame.Rect(0, self.ground_y, WIDTH, 40)
-        self.buff =  Buff.try_spawn_buff(WIDTH, HEIGHT, self.current_level.platforms, ground_rect, self.lives)
+        self.buff =  Buff.try_spawn_buff(self.current_level.platforms, ground_rect, self.lives)
         
     def handle_death(self, reason):
         if self.player.forced_state:
@@ -160,7 +160,7 @@ class Game:
             self.current_level = self.level_manager.load(next_id)
 
             ground_rect = pygame.Rect(0, self.ground_y, WIDTH, 40)
-            self.buff = Buff.try_spawn_buff(WIDTH, HEIGHT, self.current_level.platforms, ground_rect, self.lives)
+            self.buff = Buff.try_spawn_buff(self.current_level.platforms, ground_rect, self.lives)
             self.start_transition(self.LEVEL)
         else:
             self.current_level_id = 1
