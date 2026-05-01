@@ -88,7 +88,7 @@ class Game:
         # ================= GAME SYSTEMS =================
         self.hud = HUD()
         self.player = Player(*self.current_level.player_spawn)
-        self.ping = PingSystem((WIDTH, HEIGHT))
+        self.ping = PingSystem((WIDTH, HEIGHT), 280)
         self.mask = MaskSystem((WIDTH, HEIGHT), self.vignette)
         self.timer = TimerSystem(30.0, self.clock_tick)
         self.nextlevel = Screens(self.screen, self.current_level_id, self.timer.time_left, self.totalPings, self.lives)
@@ -104,6 +104,8 @@ class Game:
         self.timer.reset()
         self.totalPings = 0
         self.ping.reset()
+        for bat in self.current_level.bats:
+            bat.reset()
 
         ground_rect = pygame.Rect(0, self.ground_y, WIDTH, 40)
         self.buff =  Buff.try_spawn_buff(self.current_level.platforms, ground_rect, self.lives)
@@ -132,6 +134,8 @@ class Game:
 
         self.timer.stop_tick()
         self.ping.reset()
+        for bat in self.current_level.bats:
+            bat.reset()
         
         self.player.play_death(reason)
 
@@ -166,6 +170,18 @@ class Game:
             self.current_level_id = 1
             self.start_transition(self.MENU)
 
+    def get_active_pings(self):
+        pings = []
+
+        if self.ping.active:
+            pings.append(self.ping)
+
+        for bat in self.current_level.bats:
+            if bat.ping.active:
+                pings.append(bat.ping)
+
+        return pings
+    
     # =========================================================
     #                      EVENTS
     # =========================================================
@@ -229,7 +245,6 @@ class Game:
                         self.ping.trigger(self.player.rect.center)
                         self.totalPings += 1
                         self.timer.penalize(2)
-                        self.mask.trigger_open()
 
             # ================= MOUSE INPUT =================
             elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -239,6 +254,8 @@ class Game:
                         self.current_level_id = 1
                         self.current_level = self.level_manager.load(1)
                         self.ping.reset()
+                        for bat in self.current_level.bats:
+                            bat.reset()
                         self.start_transition(self.LEVEL)
 
                     elif self.nextlevel.quit_btn.collidepoint(event.pos):
@@ -278,17 +295,31 @@ class Game:
     #                  REVEAL SYSTEM
     # =========================================================
     def update_reveal(self):
-        for obj in self.current_level.get_all_objects():
-            if self.ping.active and self.ping.circle_rect_collision(self.ping.origin, self.ping.radius, obj.rect):
-            # if True:
-                obj.visible_timer = 10
+        pings = self.get_active_pings()
 
-            if obj.visible_timer > 0:
-                obj.visible_timer -= 1
+        # Trigger bats
+        for bat in self.current_level.bats:
+            if bat.triggered or bat.cooldown > 0 or bat.chain_delay > 0:
+                continue
+
+            for ping in pings:
+                if ping.circle_rect_collision(ping.origin, ping.radius, bat.rect):
+                    bat.trigger()
+                    break
+
+        # Reveal objects
+        for obj in self.current_level.get_all_objects():
+            visible = any(
+                ping.circle_rect_collision(ping.origin, ping.radius, obj.rect)
+                for ping in pings
+            )
+
+            if visible:
+                obj.visible_timer = 10
                 obj.alpha = min(255, obj.alpha + self.fade_speed)
             else:
                 obj.alpha = max(0, obj.alpha - self.fade_speed)
-        
+
     # =========================================================
     #                    COLLISIONS
     # =========================================================
@@ -376,28 +407,32 @@ class Game:
         dt = self.clock.get_time() / 1000
         keys = pygame.key.get_pressed()
 
-        # ================= PLAYER UPDATE =================
+        # PLAYER
         self.player.update(keys, self.current_level.platforms, self.ground_y)
 
-        # death animation lock
         if self.player.forced_state:
             if self.player.animation_finished:
                 self.start_transition(self.GAME_OVER)
             return
-        
-        # ================= TIMER =================
+
+        # TIMER
         if self.timer.update(dt):
             self.handle_death("time")
 
-        # ================= WORLD =================        
+        # WORLD
         for platform in self.current_level.platforms:
             platform.update()
 
-        # ================= SYSTEMS =================
+        # SYSTEMS
         self.ping.update()
         self.check_collisions()
         self.update_reveal()
-        self.mask.update(self.ping)
+
+        active_pings = self.get_active_pings()
+        self.mask.update(active_pings)
+
+        for bat in self.current_level.bats:
+            bat.update()
 
         if self.buff:
             self.buff.update()
@@ -405,10 +440,19 @@ class Game:
     def draw(self):
         self.screen.fill(BLACK)
         self.current_level.draw(self.screen)
+
         if self.buff:
             self.buff.draw(self.screen)
+
+        for bat in self.current_level.bats:
+            if not bat.ping.active:
+                bat.triggered = False
+            bat.ping.draw(self.screen)
+
         self.ping.draw(self.screen)
-        self.mask.draw(self.screen, self.ping)
+
+        active_pings = self.get_active_pings()
+        self.mask.draw(self.screen, active_pings)
         self.player.draw(self.screen)
         self.hud.draw(self.screen, self.current_level_id, self.timer.time_left, self.totalPings, self.lives)
 
