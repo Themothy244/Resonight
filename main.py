@@ -77,6 +77,11 @@ class Game:
         self.vignette = pygame.image.load("assets/images/effects/Vignette.png").convert_alpha()
         self.finger_snap = pygame.mixer.Sound("assets/sounds/Finger_snap.mp3")
         self.clock_tick = pygame.mixer.Sound("assets/sounds/clock_tick.mp3")
+        self.game_over_sound = pygame.mixer.Sound("assets/sounds/game_over_sfx.wav")
+        self.game_over_sound.set_volume(0.4)
+        self.win_sound = pygame.mixer.Sound("assets/sounds/win_sfx.wav")
+        self.completed_sound = pygame.mixer.Sound("assets/sounds/completed_sfx.wav")
+        self.buff_sound = pygame.mixer.Sound("assets/sounds/pickup_sound.wav")
         pygame.mixer.music.load("assets/sounds/bg_music.ogg")
         pygame.mixer.music.play(-1)
 
@@ -99,6 +104,9 @@ class Game:
         self.timer.reset()
         self.totalPings = 0
         self.ping.reset()
+
+        ground_rect = pygame.Rect(0, self.ground_y, WIDTH, 40)
+        self.buff =  Buff.try_spawn_buff(WIDTH, HEIGHT, self.current_level.platforms, ground_rect, self.lives)
 
     def reset_game(self):
         self.lives = 3
@@ -330,6 +338,7 @@ class Game:
         # ================= BUFF =================
         if self.buff and self.player.hitbox.colliderect(self.buff.rect):
             self.buff.apply_effect(self)
+            self.buff_sound.play()
             self.buff = None
 
         # clamp
@@ -345,6 +354,15 @@ class Game:
                 if self.transition_alpha >= 255:
                     self.state = self.target_state
                     self.fade_out = False
+
+                    if self.target_state == self.GAME_OVER:
+                        self.game_over_sound.play()
+
+                    elif self.target_state == self.WIN:
+                        if self.hasNextLevel:
+                            self.win_sound.play()
+                        else:
+                            self.completed_sound.play()
             else:
                 self.transition_alpha -= self.transition_speed
                 if self.transition_alpha <= 0:
@@ -370,9 +388,6 @@ class Game:
         # ================= TIMER =================
         if self.timer.update(dt):
             self.handle_death("time")
-
-            if self.lives <= 0:
-                self.deathReason = "lives"
 
         # ================= WORLD =================        
         for platform in self.current_level.platforms:
