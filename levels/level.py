@@ -2,11 +2,12 @@ import pygame
 from settings import WIDTH, HEIGHT
 
 class Level:
-    def __init__(self, platforms, spikes, doors, player_spawn, bg_path):
+    def __init__(self, platforms, spikes, doors, player_spawn, bg_path, bats=None):
         self.platforms = platforms
         self.spikes = spikes
         self.doors = doors
         self.player_spawn = player_spawn
+        self.bats = bats if bats else []
 
         self.bg = pygame.image.load(bg_path).convert()
         self.bg = pygame.transform.scale(self.bg, (WIDTH, HEIGHT))
@@ -24,6 +25,8 @@ class Level:
             s.draw(screen)
         for d in self.doors:
             d.draw(screen)
+        for b in self.bats:
+            b.draw(screen)
     
     def get_all_objects(self):
-        return self.platforms + self.spikes + self.doors
+        return self.platforms + self.spikes + self.doors + self.bats
