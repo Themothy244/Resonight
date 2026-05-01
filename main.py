@@ -112,7 +112,9 @@ class Game:
         self.final_score = 0
         self.final_rank = "C"
         self.game_over_final = False
-        self.buff = None
+
+        ground_rect = pygame.Rect(0, self.ground_y, WIDTH, 40)
+        self.buff =  Buff.try_spawn_buff(WIDTH, HEIGHT, self.current_level.platforms, ground_rect, self.lives)
         
     def handle_death(self, reason):
         if self.player.forced_state:
@@ -120,10 +122,10 @@ class Game:
     
         self.lives -= 1
 
-        self.player.play_death(reason)
-
-        self.ping.reset()
         self.timer.stop_tick()
+        self.ping.reset()
+        
+        self.player.play_death(reason)
 
         if self.lives <= 0:
             self.deathReason = "lives"
@@ -149,8 +151,6 @@ class Game:
             self.current_level_id = next_id
             self.current_level = self.level_manager.load(next_id)
 
-            self.reset_player()
-
             ground_rect = pygame.Rect(0, self.ground_y, WIDTH, 40)
             self.buff = Buff.try_spawn_buff(WIDTH, HEIGHT, self.current_level.platforms, ground_rect, self.lives)
             self.start_transition(self.LEVEL)
@@ -165,20 +165,68 @@ class Game:
         if self.transitioning:
             pygame.event.clear()
             return
-        
+
         for event in pygame.event.get():
+
             if event.type == pygame.QUIT:
                 self.running = False
-                
-            # ================= MENU / START =================
-            if self.state == self.MENU:
-                if event.type == pygame.KEYDOWN:
+
+            # ================= KEY INPUT (GLOBAL LOGIC) =================
+            if event.type == pygame.KEYDOWN:
+
+                # ---------- MENU ----------
+                if self.state == self.MENU:
                     if event.key == pygame.K_RETURN:
                         self.start_transition(self.LEVEL)
-                    if event.key == pygame.K_ESCAPE:
+
+                    elif event.key == pygame.K_ESCAPE:
                         self.running = False
 
-                elif event.type == pygame.MOUSEBUTTONDOWN:
+                # ---------- GAME OVER ----------
+                elif self.state == self.GAME_OVER:
+                    if event.key == pygame.K_RETURN:
+                        self.current_level = self.level_manager.load(self.current_level_id)
+                        self.reset_player()
+
+                        self.player.forced_state = None
+                        self.player.animation_finished = False
+
+                        if self.game_over_final:
+                            self.reset_game()
+                            self.game_over_final = False
+
+                        self.start_transition(self.LEVEL)
+
+                    elif event.key == pygame.K_ESCAPE:
+                        self.reset_game()
+                        self.start_transition(self.MENU)
+
+                # ---------- WIN ----------
+                elif self.state == self.WIN:
+                    if event.key == pygame.K_RETURN:
+                        if self.hasNextLevel:
+                            self.load_next_level()
+                        else:
+                            self.reset_game()
+                            self.start_transition(self.LEVEL)
+
+                    elif event.key == pygame.K_ESCAPE:
+                        self.reset_game()
+                        self.start_transition(self.MENU)
+
+                # ---------- PING ---------- 
+                elif self.state == self.LEVEL:
+                    if event.key == pygame.K_e:
+                        self.finger_snap.play()
+                        self.ping.trigger(self.player.rect.center)
+                        self.totalPings += 1
+                        self.timer.penalize(2)
+                        self.mask.trigger_open()
+
+            # ================= MOUSE INPUT =================
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+
+                if self.state == self.MENU:
                     if self.nextlevel.start_btn.collidepoint(event.pos):
                         self.current_level_id = 1
                         self.current_level = self.level_manager.load(1)
@@ -188,9 +236,25 @@ class Game:
                     elif self.nextlevel.quit_btn.collidepoint(event.pos):
                         self.running = False
 
-            # ================= WIN =================
-            elif self.state == self.WIN:
-                if event.type == pygame.MOUSEBUTTONDOWN:
+                elif self.state == self.GAME_OVER:
+                    if self.nextlevel.again_btn.collidepoint(event.pos):
+                        self.current_level = self.level_manager.load(self.current_level_id)
+                        self.reset_player()
+
+                        self.player.forced_state = None
+                        self.player.animation_finished = False
+
+                        if self.game_over_final:
+                            self.reset_game()
+                            self.game_over_final = False
+
+                        self.start_transition(self.LEVEL)
+
+                    elif self.nextlevel.back_btn.collidepoint(event.pos):
+                        self.start_transition(self.MENU)
+                        self.reset_game()
+
+                elif self.state == self.WIN:
                     if self.nextlevel.next_level_btn.collidepoint(event.pos):
                         if self.hasNextLevel:
                             self.load_next_level()
@@ -201,36 +265,6 @@ class Game:
                     elif self.nextlevel.back_btn.collidepoint(event.pos):
                         self.reset_game()
                         self.start_transition(self.MENU)
-
-            # ================= GAME OVER =================
-            elif self.state == self.GAME_OVER:
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if self.nextlevel.again_btn.collidepoint(event.pos):
-                            self.current_level = self.level_manager.load(self.current_level_id)
-                            self.reset_player()
-
-                            self.player.forced_state = None
-                            self.player.animation_finished = False
-
-                            if self.game_over_final:
-                                self.reset_game()
-                                self.game_over_final = False
-                                
-                            self.start_transition(self.LEVEL)
-
-                    if self.nextlevel.back_btn.collidepoint(event.pos):
-                            self.reset_player()
-                            self.start_transition(self.MENU)
-
-            # ================= LEVEL ================= 
-            elif self.state == self.LEVEL:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_e:
-                        self.finger_snap.play()
-                        self.ping.trigger(self.player.rect.center)
-                        self.totalPings += 1
-                        self.timer.penalize(2)
-                        self.mask.trigger_open()
 
     # =========================================================
     #                  REVEAL SYSTEM
@@ -246,7 +280,7 @@ class Game:
                 obj.alpha = min(255, obj.alpha + self.fade_speed)
             else:
                 obj.alpha = max(0, obj.alpha - self.fade_speed)
-          
+        
     # =========================================================
     #                    COLLISIONS
     # =========================================================
@@ -340,7 +374,7 @@ class Game:
             if self.lives <= 0:
                 self.deathReason = "lives"
 
-         # ================= WORLD =================        
+        # ================= WORLD =================        
         for platform in self.current_level.platforms:
             platform.update()
 
