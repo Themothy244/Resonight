@@ -63,6 +63,20 @@ class Game:
         self.target_state = None
         self.fade_out = False
 
+        # ================= ASSETS =================
+        self.vignette = pygame.image.load("assets/images/effects/Vignette.png").convert_alpha()
+        self.finger_snap = pygame.mixer.Sound("assets/sounds/Finger_snap.mp3")
+        self.bat_sfx = pygame.mixer.Sound("assets/sounds/bat_sfx.wav")
+        self.bat_sfx.set_volume(0.5)
+        self.clock_tick = pygame.mixer.Sound("assets/sounds/clock_tick.mp3")
+        self.game_over_sound = pygame.mixer.Sound("assets/sounds/game_over_sfx.wav")
+        self.game_over_sound.set_volume(0.4)
+        self.win_sound = pygame.mixer.Sound("assets/sounds/win_sfx.wav")
+        self.completed_sound = pygame.mixer.Sound("assets/sounds/completed_sfx.wav")
+        self.buff_sound = pygame.mixer.Sound("assets/sounds/pickup_sound.wav")
+        pygame.mixer.music.load("assets/sounds/bg_music.ogg")
+        pygame.mixer.music.play(-1)
+        
         # ================= LEVELS =================
         self.level_manager = LevelManager()
 
@@ -72,18 +86,6 @@ class Game:
 
         self.current_level_id = 1
         self.current_level = self.level_manager.load(self.current_level_id)
-        
-        # ================= ASSETS =================
-        self.vignette = pygame.image.load("assets/images/effects/Vignette.png").convert_alpha()
-        self.finger_snap = pygame.mixer.Sound("assets/sounds/Finger_snap.mp3")
-        self.clock_tick = pygame.mixer.Sound("assets/sounds/clock_tick.mp3")
-        self.game_over_sound = pygame.mixer.Sound("assets/sounds/game_over_sfx.wav")
-        self.game_over_sound.set_volume(0.4)
-        self.win_sound = pygame.mixer.Sound("assets/sounds/win_sfx.wav")
-        self.completed_sound = pygame.mixer.Sound("assets/sounds/completed_sfx.wav")
-        self.buff_sound = pygame.mixer.Sound("assets/sounds/pickup_sound.wav")
-        pygame.mixer.music.load("assets/sounds/bg_music.ogg")
-        pygame.mixer.music.play(-1)
 
         # ================= GAME SYSTEMS =================
         self.hud = HUD()

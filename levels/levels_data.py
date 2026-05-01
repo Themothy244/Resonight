@@ -83,7 +83,7 @@ def load_levels(self):
         player_spawn=(120, 550),
         bg_path="assets/images/backgrounds/bg_2.png",
         bats=[
-            Bat(500, 430)
+            Bat(500, 430, self.bat_sfx)
         ]
     )
     # ---------------- LEVEL 4 ----------------
@@ -113,7 +113,7 @@ def load_levels(self):
         player_spawn=(120, 550),
         bg_path="assets/images/backgrounds/bg_2.png",
         bats=[
-            Bat(600, 280)
+            Bat(600, 280, self.bat_sfx)
         ]
     )
     # ---------------- LEVEL 5 ----------------
@@ -160,12 +160,12 @@ def load_levels(self):
         ],
         doors=[
             Door(50, self.ground_y - 80, 60, 80, "entrance"),
-            Door(900, 250, 60, 80, "exit"),
+            Door(900, 250, 60, 80, "exit")
         ],
         player_spawn=(120, 550),
         bg_path="assets/images/backgrounds/bg_2.png",
         bats=[
-            Bat(800, 360)
+            Bat(800, 360, self.bat_sfx)
         ]
     )
     # ---------------- LEVEL 7 ----------------
@@ -195,7 +195,7 @@ def load_levels(self):
         player_spawn=(40, 580),
         bg_path="assets/images/backgrounds/bg_2.png",
         bats=[
-            Bat(400, 290)
+            Bat(400, 290, self.bat_sfx)
         ]
     )
 
@@ -275,7 +275,7 @@ def load_levels(self):
         player_spawn=(120, self.ground_y - 70),
         bg_path="assets/images/backgrounds/bg_2.png",
         bats=[
-            Bat(450, 280)
+            Bat(450, 280, self.bat_sfx)
         ]
     )
 
@@ -310,7 +310,7 @@ def load_levels(self):
         player_spawn=(120, self.ground_y - 70),
         bg_path="assets/images/backgrounds/bg_2.png",
         bats=[
-            Bat(600, 160)
+            Bat(600, 160, self.bat_sfx)
         ]
     )
 
