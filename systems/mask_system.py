@@ -7,34 +7,46 @@ class MaskSystem:
 
         self.dark_surface = pygame.Surface(screen_size, pygame.SRCALPHA)
 
-        self.mask_closing = False
-        self.mask_timer = 0
-        self.MASK_DELAY = 30
-    
-    def trigger_open(self):
-        self.mask_closing = False
-        self.mask_timer = 0
+        self.fade_pings = []
+        self.FADE_DELAY = 30
 
-    def update(self, ping):
-        if not ping.active:
-            self.mask_closing = True
+    def update(self, active_pings):
+        active_set = set(active_pings)
 
-        if self.mask_closing:
-            self.mask_timer += 1
-            if self.mask_timer >= self.MASK_DELAY:
-                self.mask_closing = False
-                ping.radius = 0
+        # Track new pings
+        existing = [fp["ping"] for fp in self.fade_pings]
+        for ping in active_pings:
+            if ping.radius > 0 and ping not in existing:
+                self.fade_pings.append({"ping": ping, "timer": 0})
 
-    def draw(self, screen, ping):
-        if ping.radius <= 0:
+        # Update fade timers
+        for fp in self.fade_pings:
+            if fp["ping"] not in active_set or fp["ping"].radius <= 0:
+                fp["timer"] += 1
+
+        # Remove expired
+        self.fade_pings = [
+            fp for fp in self.fade_pings
+            if fp["timer"] < self.FADE_DELAY
+        ]
+
+    def draw(self, screen, active_pings):
+        self.dark_surface.fill((0, 0, 0, 255))
+
+        all_pings = list(active_pings) + [dp["ping"] for dp in self.fade_pings]
+
+        if not all_pings:
             screen.fill((0, 0, 0))
             return
 
-        self.dark_surface.fill((0, 0, 0, 255))
+        for ping in all_pings:
+            size = int(ping.radius * 2.3)
+            if size <= 0:
+                continue
 
-        size = int(ping.radius * 2.3)
-        vignette_scaled = pygame.transform.smoothscale(self.vignette, (size, size))
-        rect = vignette_scaled.get_rect(center=ping.origin)
+            vignette_scaled = pygame.transform.smoothscale(self.vignette, (size, size))
+            rect = vignette_scaled.get_rect(center=ping.origin)
 
-        self.dark_surface.blit(vignette_scaled, rect, special_flags=pygame.BLEND_RGBA_MULT)
+            self.dark_surface.blit(vignette_scaled, rect, special_flags=pygame.BLEND_RGBA_MULT)
+
         screen.blit(self.dark_surface, (0, 0))
