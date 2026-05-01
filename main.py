@@ -29,7 +29,10 @@ class Game:
         self.GAME_OVER = "game_over"
         self.WIN = "win"
         self.state = self.MENU
+
         self.lives = 3
+        self.game_over_final = False
+        self.hasNextLevel = True
 
         # ================= WORLD =================
         self.ground_y = HEIGHT - 40
@@ -37,6 +40,7 @@ class Game:
         # ================= GAME DATA / STATS =================
         self.totalPings = 0
         self.deathReason = ""
+
         self.win_level = 0
         self.win_time = 0
         self.win_pings = 0
@@ -50,29 +54,24 @@ class Game:
         self.final_score = 0
         self.final_rank = "C"
 
-        # ================= INPUT & FLAGS =================
-        self.hasNextLevel = True
-
         # ================= TRANSITIONS & EFFECTS =================
         self.transitioning = False
         self.transition_alpha = 0
-        self.transition_duration = 0.5  # seconds
+        self.transition_duration = 0.5 
         self.transition_speed = 255 / (FPS * self.transition_duration)
         self.fade_speed = 255 / 18
         self.target_state = None
         self.fade_out = False
 
+        # ================= LEVELS =================
         self.level_manager = LevelManager()
 
         levels = load_levels(self)
-
         for level_id, level in levels.items():
             self.level_manager.add_level(level_id, level)
 
         self.current_level_id = 1
         self.current_level = self.level_manager.load(self.current_level_id)
-        ground_rect = pygame.Rect(0, self.ground_y, WIDTH, 40)
-        self.buff =  Buff.try_spawn_buff(WIDTH, HEIGHT, self.current_level.platforms, ground_rect, self.lives)
         
         # ================= ASSETS =================
         self.vignette = pygame.image.load("assets/images/effects/Vignette.png").convert_alpha()
@@ -83,17 +82,20 @@ class Game:
 
         # ================= GAME SYSTEMS =================
         self.hud = HUD()
-        self.player = Player(*self.current_level.player_spawn, 40, 40)
+        self.player = Player(*self.current_level.player_spawn)
         self.ping = PingSystem((WIDTH, HEIGHT))
         self.mask = MaskSystem((WIDTH, HEIGHT), self.vignette)
         self.timer = TimerSystem(30.0, self.clock_tick)
         self.nextlevel = Screens(self.screen, self.current_level_id, self.timer.time_left, self.totalPings, self.lives)
+        
+        ground_rect = pygame.Rect(0, self.ground_y, WIDTH, 40)
+        self.buff =  Buff.try_spawn_buff(WIDTH, HEIGHT, self.current_level.platforms, ground_rect, self.lives)
 
     # =========================================================
     #                     STATE CONTROL
     # =========================================================
     def reset_player(self):
-        self.player = Player(*self.current_level.player_spawn, 40, 40)
+        self.player = Player(*self.current_level.player_spawn)
         self.timer.reset()
         self.totalPings = 0
         self.ping.reset()
@@ -102,29 +104,42 @@ class Game:
         self.lives = 3
         self.current_level_id = 1
         self.current_level = self.level_manager.load(1)
+
         self.reset_player()
 
         self.run_total_time = 0
         self.run_total_pings = 0
         self.final_score = 0
         self.final_rank = "C"
+        self.game_over_final = False
+        self.buff = None
         
     def handle_death(self, reason):
+        if self.player.forced_state:
+            return
+    
         self.lives -= 1
-        self.deathReason = reason
+
+        self.player.play_death(reason)
+
+        self.ping.reset()
+        self.timer.stop_tick()
 
         if self.lives <= 0:
             self.deathReason = "lives"
+            self.game_over_final = True
             self.buff = None
-
-        self.start_transition(self.GAME_OVER)
+        else:
+            self.deathReason = reason
 
     def start_transition(self, new_state):
-        if not self.transitioning:
-            self.transitioning = True
-            self.target_state = new_state
-            self.transition_alpha = 0
-            self.fade_out = True
+        if self.transitioning:
+            return
+        
+        self.transitioning = True
+        self.target_state = new_state
+        self.transition_alpha = 0
+        self.fade_out = True
 
     def load_next_level(self):
         next_id = self.current_level_id + 1
@@ -132,8 +147,10 @@ class Game:
 
         if self.level_manager.has_level(next_id):
             self.current_level_id = next_id
-
             self.current_level = self.level_manager.load(next_id)
+
+            self.reset_player()
+
             ground_rect = pygame.Rect(0, self.ground_y, WIDTH, 40)
             self.buff = Buff.try_spawn_buff(WIDTH, HEIGHT, self.current_level.platforms, ground_rect, self.lives)
             self.start_transition(self.LEVEL)
@@ -152,6 +169,7 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+                
             # ================= MENU / START =================
             if self.state == self.MENU:
                 if event.type == pygame.KEYDOWN:
@@ -160,14 +178,14 @@ class Game:
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
 
-                if event.type == pygame.MOUSEBUTTONDOWN:
+                elif event.type == pygame.MOUSEBUTTONDOWN:
                     if self.nextlevel.start_btn.collidepoint(event.pos):
                         self.current_level_id = 1
                         self.current_level = self.level_manager.load(1)
                         self.ping.reset()
                         self.start_transition(self.LEVEL)
 
-                    if self.nextlevel.quit_btn.collidepoint(event.pos):
+                    elif self.nextlevel.quit_btn.collidepoint(event.pos):
                         self.running = False
 
             # ================= WIN =================
@@ -180,7 +198,7 @@ class Game:
                             self.reset_game()
                             self.start_transition(self.LEVEL)
 
-                    if self.nextlevel.back_btn.collidepoint(event.pos):
+                    elif self.nextlevel.back_btn.collidepoint(event.pos):
                         self.reset_game()
                         self.start_transition(self.MENU)
 
@@ -190,10 +208,15 @@ class Game:
                     if self.nextlevel.again_btn.collidepoint(event.pos):
                             self.current_level = self.level_manager.load(self.current_level_id)
                             self.reset_player()
-                            self.start_transition(self.LEVEL)
 
-                            if self.lives <= 0:
+                            self.player.forced_state = None
+                            self.player.animation_finished = False
+
+                            if self.game_over_final:
                                 self.reset_game()
+                                self.game_over_final = False
+                                
+                            self.start_transition(self.LEVEL)
 
                     if self.nextlevel.back_btn.collidepoint(event.pos):
                             self.reset_player()
@@ -231,30 +254,28 @@ class Game:
         if self.transitioning:
             return
         
+        # ================= SPIKES =================
         for s in self.current_level.spikes:
             if self.player.hitbox.colliderect(s.rect):
-                self.ping.reset()
                 self.handle_death("spike")
-                self.timer.stop_tick()
-                self.start_transition(self.GAME_OVER)
-
-                if self.lives <= 0:
-                    self.deathReason = "lives"
                 break
         
+        # ================= EXIT DOOR =================
         for d in self.current_level.doors:
             if d.doorType == "exit" and self.player.hitbox.colliderect(d.rect):
-                self.ping.reset()
                 self.timer.stop_tick()
+
                 self.win_level = self.current_level_id
                 self.win_time = self.timer.time_left
                 self.win_pings = self.totalPings
                 self.win_lives = self.lives
+
                 self.run_total_time += self.timer.time_left
                 self.run_total_pings += self.totalPings
 
                 next_id = self.current_level_id + 1
                 self.hasNextLevel = self.level_manager.has_level(next_id)
+
                 if not self.hasNextLevel:
                     self.final_time = self.run_total_time
                     self.final_pings = self.run_total_pings
@@ -269,12 +290,15 @@ class Game:
                         self.final_rank = "B"
                     else:
                         self.final_rank = "C"
+
                 self.start_transition(self.WIN)
 
+        # ================= BUFF =================
         if self.buff and self.player.hitbox.colliderect(self.buff.rect):
             self.buff.apply_effect(self)
             self.buff = None
 
+        # clamp
         self.player.hitbox.x = max(0, min(self.player.hitbox.x, WIDTH - self.player.hitbox.width))
 
     # =========================================================
@@ -298,24 +322,34 @@ class Game:
     # =========================================================
     def update(self):
         dt = self.clock.get_time() / 1000
+        keys = pygame.key.get_pressed()
 
+        # ================= PLAYER UPDATE =================
+        self.player.update(keys, self.current_level.platforms, self.ground_y)
+
+        # death animation lock
+        if self.player.forced_state:
+            if self.player.animation_finished:
+                self.start_transition(self.GAME_OVER)
+            return
+        
+        # ================= TIMER =================
         if self.timer.update(dt):
             self.handle_death("time")
 
             if self.lives <= 0:
-                self.reset_game()
                 self.deathReason = "lives"
 
-            self.start_transition(self.GAME_OVER)
-        
+         # ================= WORLD =================        
         for platform in self.current_level.platforms:
             platform.update()
-        keys = pygame.key.get_pressed()
-        self.player.update(keys, self.current_level.platforms, self.ground_y)
+
+        # ================= SYSTEMS =================
         self.ping.update()
         self.check_collisions()
         self.update_reveal()
         self.mask.update(self.ping)
+
         if self.buff:
             self.buff.update()
     
