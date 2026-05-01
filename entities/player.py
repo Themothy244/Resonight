@@ -142,6 +142,10 @@ class Player:
                 self.animation_finished = True
 
             self.image = frames[int(self.frame_index)]
+            
+            if not self.facing_right:
+                self.image = pygame.transform.flip(self.image, True, False)
+            
             return 
 
         # ---------- MOVEMENT ----------
