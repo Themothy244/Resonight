@@ -1,6 +1,7 @@
 from entities.platform import Platform
 from entities.spike import Spike
 from entities.door import Door
+from entities.bat import Bat
 from levels.level import Level
 
 def load_levels(self):
@@ -22,7 +23,7 @@ def load_levels(self):
             Door(830, 350, 54, 70, "exit"),
         ],
         player_spawn=(120, 550),
-        bg_path="assets/images/backgrounds/bg_2.png"
+        bg_path="assets/images/backgrounds/bg_2.png",
     )
 
     # ---------------- LEVEL 2 ----------------
@@ -80,7 +81,10 @@ def load_levels(self):
             Door(850, 608, 50, 70, "exit"),
         ],
         player_spawn=(120, 550),
-        bg_path="assets/images/backgrounds/bg_2.png"
+        bg_path="assets/images/backgrounds/bg_2.png",
+        bats=[
+            Bat(500, 430)
+        ]
     )
     # ---------------- LEVEL 4 ----------------
     level4 = Level(
@@ -107,7 +111,10 @@ def load_levels(self):
             Door(800, 180, 50, 70, "exit"),
         ],
         player_spawn=(120, 550),
-        bg_path="assets/images/backgrounds/bg_2.png"
+        bg_path="assets/images/backgrounds/bg_2.png",
+        bats=[
+            Bat(600, 280)
+        ]
     )
     # ---------------- LEVEL 5 ----------------
     level5 = Level(
@@ -156,7 +163,10 @@ def load_levels(self):
             Door(900, 250, 60, 80, "exit"),
         ],
         player_spawn=(120, 550),
-        bg_path="assets/images/backgrounds/bg_2.png"
+        bg_path="assets/images/backgrounds/bg_2.png",
+        bats=[
+            Bat(800, 360)
+        ]
     )
     # ---------------- LEVEL 7 ----------------
     level7 = Level(
@@ -183,7 +193,10 @@ def load_levels(self):
             Door(20, 80, 60, 80, "exit")        
         ],
         player_spawn=(40, 580),
-        bg_path="assets/images/backgrounds/bg_2.png"
+        bg_path="assets/images/backgrounds/bg_2.png",
+        bats=[
+            Bat(400, 290)
+        ]
     )
 
     # ---------------- LEVEL 8 ----------------
@@ -260,7 +273,10 @@ def load_levels(self):
             Door(860, 270, 60, 80, "exit"),
         ],
         player_spawn=(120, self.ground_y - 70),
-        bg_path="assets/images/backgrounds/bg_2.png"
+        bg_path="assets/images/backgrounds/bg_2.png",
+        bats=[
+            Bat(450, 280)
+        ]
     )
 
     # ---------------- LEVEL 10 ----------------
@@ -292,7 +308,10 @@ def load_levels(self):
             Door(790, 50, 60, 80, "exit"),
         ],
         player_spawn=(120, self.ground_y - 70),
-        bg_path="assets/images/backgrounds/bg_2.png"
+        bg_path="assets/images/backgrounds/bg_2.png",
+        bats=[
+            Bat(600, 160)
+        ]
     )
 
     return {
