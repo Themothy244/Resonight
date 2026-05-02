@@ -26,8 +26,8 @@ class Screens:
         self.font_ping = pygame.font.SysFont("arial", 30)
         self.font_btn = pygame.font.SysFont("arial", 35)
 
-        self.start_btn = pygame.Rect(WIDTH//2 - 150, 360, 300, 60)
-        self.quit_btn = pygame.Rect(WIDTH//2 - 150, 440, 300, 60)
+        self.start_btn = pygame.Rect(600, 440, 300, 60)
+        self.quit_btn = pygame.Rect(600, 520, 300, 60)
 
         self.next_level_btn = pygame.Rect(WIDTH//2 - 150, 400, 300, 60)
         self.back_btn = pygame.Rect(WIDTH//2 - 150, 480, 300, 60)
@@ -36,10 +36,12 @@ class Screens:
         
         self.heart = pygame.image.load("assets/images/entities/health_icon.png").convert_alpha()
         self.empty = pygame.image.load("assets/images/entities/health_icon_blank.png").convert_alpha()
+        self.menu_bg = pygame.image.load("assets/images/backgrounds/menu_bg.png").convert_alpha()
         
         self.heart_width, self.heart_height = 50, 50
         self.heart = pygame.transform.scale(self.heart, (self.heart_width, self.heart_height))
         self.empty = pygame.transform.scale(self.empty, (self.heart_width, self.heart_height))
+        self.menu_bg = pygame.transform.scale(self.menu_bg, (WIDTH, HEIGHT))
     
     def draw_lives(self):
         # ================= LIVES =================
@@ -55,13 +57,13 @@ class Screens:
     #                          MENU 
     # =========================================================
     def draw_menu(self, mouse_pos):
-        self.screen.fill((0, 0, 0))
+        self.screen.blit(self.menu_bg, (0, 0))
 
         title = self.font_inter.render("Resonight", True, (255, 255, 255))
         subtitle = self.font_courier.render("Echo your way out.", True, (180, 180, 180))
 
-        self.screen.blit(title, (WIDTH // 2 - title.get_width() // 2, 200))
-        self.screen.blit(subtitle, (WIDTH // 2 - subtitle.get_width() // 2, 300))
+        self.screen.blit(title, (120, 100))
+        self.screen.blit(subtitle, (120, 200))
     
         # ================= START BUTTON =================
         if self.start_btn.collidepoint(mouse_pos):
@@ -88,7 +90,7 @@ class Screens:
             self.quit_btn.centerx - quit_text.get_width() // 2,
             self.quit_btn.centery - quit_text.get_height() // 2
         ))
-
+        
     # =========================================================
     #                          WIN 
     # =========================================================
